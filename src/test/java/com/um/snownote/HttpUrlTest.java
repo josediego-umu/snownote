@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.um.snownote.client.HttpClientFactory;
 import com.um.snownote.client.HttpUrl;
-import com.um.snownote.repository.IHttpUrlRepository;
+import com.um.snownote.repository.interfaces.IHttpUrlRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.um.snownote;
 
 import com.um.snownote.model.User;
-import com.um.snownote.repository.IUserRepository;
+import com.um.snownote.repository.interfaces.IUserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

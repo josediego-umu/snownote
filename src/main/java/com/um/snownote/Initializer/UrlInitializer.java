@@ -2,7 +2,7 @@ package com.um.snownote.Initializer;
 
 import com.um.snownote.client.HttpClientFactory;
 import com.um.snownote.client.HttpUrl;
-import com.um.snownote.repository.IHttpUrlRepository;
+import com.um.snownote.repository.interfaces.IHttpUrlRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

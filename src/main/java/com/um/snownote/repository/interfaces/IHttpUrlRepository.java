@@ -1,4 +1,4 @@
-package com.um.snownote.repository;
+package com.um.snownote.repository.interfaces;
 
 import com.um.snownote.client.HttpUrl;
 import org.springframework.data.mongodb.repository.MongoRepository;
