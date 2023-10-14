@@ -39,6 +39,14 @@ public class MongoConfig {
             mongoTemplate.createCollection("httpUrls");
         }
 
+        if (!colleSet.contains("structuredDatas")) {
+            mongoTemplate.createCollection("structuredDatas");
+        }
+
+        if (!colleSet.contains("projects")) {
+            mongoTemplate.createCollection("projects");
+        }
+
         return mongoTemplate;
     }
 }

@@ -11,4 +11,9 @@ import java.util.List;
 public interface IUserRepository extends MongoRepository<User, String> {
     @Query("{'name': ?0}")
     List<User> findUserByName(String name);
+
+    @Query("{'username': ?0, 'password': ?1}")
+    User findUserByUsernameAndPassword(String username, String password);
+    @Query("{'username': ?0}")
+    User findUserByUsername(String username);
 }

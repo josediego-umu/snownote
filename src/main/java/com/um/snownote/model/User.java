@@ -3,6 +3,8 @@ package com.um.snownote.model;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Document(collection = "user")
 public class User {
     @Id
@@ -11,7 +13,7 @@ public class User {
     String username;
     String password;
     String email;
-    String phone;
+    Date dateOfBirth;
 
     public User() {
     }
@@ -56,11 +58,11 @@ public class User {
         this.email = email;
     }
 
-    public String getPhone() {
-        return phone;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

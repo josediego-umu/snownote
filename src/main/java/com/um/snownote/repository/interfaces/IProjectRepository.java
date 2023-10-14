@@ -1,10 +1,9 @@
 package com.um.snownote.repository.interfaces;
 
-import com.um.snownote.client.HttpUrl;
+import com.um.snownote.model.Project;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IHttpUrlRepository extends MongoRepository<HttpUrl, String> {
-
+public interface IProjectRepository extends MongoRepository<Project, String> {
 }

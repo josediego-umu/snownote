@@ -7,6 +7,7 @@ import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.LoaderFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -15,7 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-
+@Service
 public class LoaderFileCsv implements LoaderFile {
 
     private static final Logger logger = LoggerFactory.getLogger(LoaderFileCsv.class);
