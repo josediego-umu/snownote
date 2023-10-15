@@ -14,13 +14,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    private final IUserService userService;
     @Autowired
-    private IUserService userService;
-
-    public UserController() {
+    public UserController(IUserService userService) {
+        this.userService = userService;
     }
     @PostMapping("/login")
-    public boolean login(@RequestParam String username, @RequestParam String password) {
+    public User login(@RequestParam String username, @RequestParam String password) {
         return userService.login(username, password);
     }
 
@@ -35,6 +35,11 @@ public class UserController {
     @GetMapping
     public List<User> getUsers() {
         return userService.getAllUsers();
+    }
+
+    @PutMapping
+    public User updateUser(@RequestBody User user) {
+        return userService.updateUser(user);
     }
 
 }

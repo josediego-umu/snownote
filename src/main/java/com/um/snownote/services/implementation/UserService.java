@@ -11,13 +11,15 @@ import java.util.List;
 
 @Service
 public class UserService implements IUserService {
+    private final IUserRepository userRepository;
     @Autowired
-    private IUserRepository userRepository;
+    public UserService(IUserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
-    public boolean login(String username, String password) {
-        User user = userRepository.findUserByUsernameAndPassword(username, password);
-        return user != null;
+    public User login(String username, String password) {
+        return userRepository.findUserByUsernameAndPassword(username, password);
     }
 
     @Override
@@ -52,8 +54,14 @@ public class UserService implements IUserService {
         return userRepository.findUserByUsername(username);
     }
 
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public User updateUser(User user) {
+        return userRepository.save(user);
     }
 
 }

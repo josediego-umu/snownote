@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 public interface IUserService {
 
-    boolean login(String username, String password);
+    User login(String username, String password);
 
     User register(String username, String password, String email, String name, String dateOfBirth);
 
@@ -17,4 +17,7 @@ public interface IUserService {
     User getUser(String username);
 
     List<User> getAllUsers();
+
+    User updateUser(User user);
+
 }
