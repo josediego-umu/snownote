@@ -4,6 +4,8 @@ import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Document(collection = "projects")
@@ -19,6 +21,25 @@ public class Project {
     private List<User> readers;
     @DBRef
     private List<User> writers;
+    private Date createDate;
+    @DBRef
+    private User updateBy;
+    private Date updateDate;
+    private boolean status;
+
+    public Project() {
+    }
+
+    public Project(String name, User owner) {
+        this.name = name;
+        this.owner = owner;
+        this.structuredData = new StructuredData();
+        this.readers = new ArrayList<>();
+        this.writers = new ArrayList<>();
+        this.createDate = new Date();
+        this.updateBy = null;
+        this.updateDate = null;
+    }
 
     public String getName() {
         return name;
@@ -137,5 +158,39 @@ public class Project {
         writers.add(index, writer);
     }
 
+    public Date getCreateDate() {
+        return createDate;
+    }
 
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public User getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(User updateBy) {
+        this.updateBy = updateBy;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public void changeStatus() {
+        this.status = !this.status;
+    }
 }

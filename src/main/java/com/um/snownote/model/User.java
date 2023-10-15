@@ -14,8 +14,18 @@ public class User {
     String password;
     String email;
     Date dateOfBirth;
+    boolean status;
 
     public User() {
+    }
+
+    public User(String name, String username, String password, String email, Date dateOfBirth) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.status = true;
     }
 
     public String getId() {
@@ -64,5 +74,13 @@ public class User {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }
