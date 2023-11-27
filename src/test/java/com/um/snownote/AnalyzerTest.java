@@ -1,13 +1,6 @@
 package com.um.snownote;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.um.snownote.client.HttpClientFactory;
-import com.um.snownote.client.HttpUrl;
-import com.um.snownote.model.Label;
 import com.um.snownote.model.StructuredData;
-import com.um.snownote.repository.interfaces.IHttpUrlRepository;
-import com.um.snownote.services.implementation.Analyzer;
 import com.um.snownote.services.implementation.LoaderFileCsv;
 import com.um.snownote.services.interfaces.IAnalyzer;
 import com.um.snownote.services.interfaces.LoaderFile;
@@ -16,12 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Map;
 
 @SpringBootTest
 public class AnalyzerTest {
