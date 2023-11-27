@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Objects;
 
 @Document(collection = "projects")
 public class Project {
@@ -137,5 +138,27 @@ public class Project {
         writers.add(index, writer);
     }
 
+    @Override
+    public String toString() {
+        return "Project{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", structuredData=" + structuredData +
+                ", owner=" + owner +
+                ", readers=" + readers +
+                ", writers=" + writers +
+                '}';
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Project project)) return false;
+        return Objects.equals(getId(), project.getId()) && Objects.equals(getName(), project.getName()) && Objects.equals(getStructuredData(), project.getStructuredData()) && Objects.equals(getOwner(), project.getOwner()) && Objects.equals(getReaders(), project.getReaders()) && Objects.equals(getWriters(), project.getWriters());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getStructuredData(), getOwner(), getReaders(), getWriters());
+    }
 }

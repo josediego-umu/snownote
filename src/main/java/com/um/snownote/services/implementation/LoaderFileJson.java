@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
@@ -31,6 +32,15 @@ public class LoaderFileJson implements LoaderFile {
             logger.error(e.getMessage(), e);
             return null;
 
+        }
+    }
+
+    @Override
+    public void export(StructuredData structuredData, String path) {
+        try {
+            objectMapper.writeValue(new FileWriter(path), structuredData);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
     }
 

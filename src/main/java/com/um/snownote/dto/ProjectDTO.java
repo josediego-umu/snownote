@@ -1,4 +1,4 @@
-package com.um.snownote.DTO;
+package com.um.snownote.dto;
 
 public class ProjectDTO {
 }

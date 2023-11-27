@@ -19,8 +19,10 @@ import java.util.List;
 @SpringBootTest
 public class OpenCsvTest {
 
-    private final String FILEPATHCSV = "D:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.csv";
-    private final String FILEPATHJSON = "D:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.json";
+    private final String FILEPATHCSV = "C:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.csv";
+    private final String FILEPATHOUTCSV = "C:\\UM\\TFG\\examples\\TEST_OUT.csv";
+    private final String FILEPATHOUTJSON = "C:\\UM\\TFG\\examples\\TEST_OUT.json";
+    private final String FILEPATHJSON = "C:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.json";
     private final LoaderFile loaderFileCsv = new LoaderFileCsv();
     private final LoaderFile loaderFileJson = new LoaderFileJson();
 
@@ -76,11 +78,27 @@ public class OpenCsvTest {
         for (Row row : structuredData.getRows()) {
 
             for (String s : row.getValuesRow()) {
-                System.out.print(s + ',');
+                System.out.print(s + ",");
             }
 
             System.out.println();
         }
+
+    }
+
+    @Test
+    public void exportFileCsvTest() {
+
+        StructuredData structuredData = loaderFileCsv.load(FILEPATHCSV);
+        loaderFileCsv.export(structuredData, FILEPATHOUTCSV);
+
+    }
+
+    @Test
+    public void exportFileJsonTest() {
+
+        StructuredData structuredData = loaderFileJson.load(FILEPATHJSON);
+        loaderFileJson.export(structuredData, FILEPATHOUTJSON);
 
     }
 
