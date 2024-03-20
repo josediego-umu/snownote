@@ -7,26 +7,27 @@ import com.um.snownote.repository.interfaces.IProjectRepository;
 import com.um.snownote.repository.interfaces.IStructuredDataRepository;
 import com.um.snownote.repository.interfaces.IUserRepository;
 import com.um.snownote.services.implementation.LoaderFileCsv;
-import com.um.snownote.services.interfaces.LoaderFile;
+import com.um.snownote.services.interfaces.ILoaderFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
 class SnownoteApplicationTests {
+
     @Autowired
     private IUserRepository userRepository;
     @Autowired
     private IProjectRepository projectRepository;
     @Autowired
     private IStructuredDataRepository structuredDataRepository;
-    private final String FILEPATHCSV = "D:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.csv";
-    private final String FILEPATHJSON = "D:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.json";
+    private final String FILEPATHCSV = "C:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.csv";
+    private final String FILEPATHJSON = "C:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.json";
 
     @Test
     public void insertUser() {
@@ -36,7 +37,7 @@ class SnownoteApplicationTests {
         user.setUsername("test");
         user.setPassword("test");
         user.setEmail("test");
-        user.setDateOfBirth(new Date());
+        user.setDateOfBirth(LocalDateTime.now());
         userRepository.save(user);
 
         Optional<User> userRecover = userRepository.findById(user.getId());
@@ -55,7 +56,7 @@ class SnownoteApplicationTests {
 
     @Test
     public void SaveProjectTest() {
-        LoaderFile loaderFile = new LoaderFileCsv();
+        ILoaderFile loaderFile = new LoaderFileCsv();
         StructuredData structuredData = loaderFile.load(FILEPATHCSV);
         structuredData = structuredDataRepository.save(structuredData);
         Project project = new Project();

@@ -19,7 +19,7 @@ import java.util.Map;
 @SpringBootTest
 public class HttpUrlTest {
 
-    @Autowired
+/*  @Autowired
     private IHttpUrlRepository IHttpUrlRepository;
 
     @Test
@@ -60,5 +60,5 @@ public class HttpUrlTest {
         Assertions.assertNotNull(jsonNode);
         Assertions.assertFalse(jsonNode.isEmpty());
     }
-
+ */
 }

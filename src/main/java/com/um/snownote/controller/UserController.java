@@ -1,45 +1,62 @@
 package com.um.snownote.controller;
 
 
-
+import com.um.snownote.dto.UserDTO;
+import com.um.snownote.mappers.MapperDTO;
 import com.um.snownote.model.User;
 import com.um.snownote.services.interfaces.IUserService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
     private final IUserService userService;
+    private final MapperDTO mapper = MapperDTO.INSTANCE;
+
     @Autowired
     public UserController(IUserService userService) {
         this.userService = userService;
     }
+
     @PostMapping("/login")
-    public User login(@RequestParam String username, @RequestParam String password) {
-        return userService.login(username, password);
+    public UserDTO login(@RequestBody User user) {
+        return mapper.userToUserDTO(userService.login(user.getUsername(), user.getPassword()));
     }
 
+    /*TODO
+    Cambiar el metodo de registro para que reciba un objeto UserDTO y no los parametros por separado, cambiar el formado de fechas a ISO 8601
+     */
     @PostMapping("/register")
-    public boolean register(@RequestParam String username, @RequestParam String password, @RequestParam String email, @RequestParam String name, @RequestParam String dateOfBirth) {
-        return userService.register(username, password, email, name, dateOfBirth.trim()) != null;
+    public User register(@RequestBody User user) {
+        return userService.register(user);
     }
+
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getUser(@PathVariable String username) {
         return userService.getUser(username);
     }
+
     @GetMapping
-    public List<User> getUsers() {
-        return userService.getAllUsers();
+    public List<UserDTO> getUsers() {
+        List<User> users = userService.getAllUsers();
+        List<UserDTO> userDTOS = new ArrayList<>();
+
+        for (User user : users) {
+            userDTOS.add(mapper.userToUserDTO(user));
+        }
+
+        return userDTOS;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
+    public UserDTO updateUser(@RequestBody User user) {
+
+        return mapper.userToUserDTO(userService.updateUser(user));
     }
 
 }

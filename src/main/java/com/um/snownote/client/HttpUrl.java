@@ -1,6 +1,8 @@
 package com.um.snownote.client;
 
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -20,6 +22,9 @@ public class HttpUrl {
     private String url;
     @Indexed(unique = true)
     private String method;
+
+    public HttpUrl() {
+    }
 
     public String getId() {
         return id;

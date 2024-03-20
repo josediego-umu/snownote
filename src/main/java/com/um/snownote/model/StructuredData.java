@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Document(collection = "structuredDatas")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StructuredData {
+public class StructuredData extends AuditData{
     @Id
     private String id;
     private List<Row> rows;

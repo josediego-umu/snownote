@@ -6,12 +6,14 @@ import com.um.snownote.services.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class UserService implements IUserService {
     private final IUserRepository userRepository;
+
     @Autowired
     public UserService(IUserRepository userRepository) {
         this.userRepository = userRepository;
@@ -34,7 +36,8 @@ public class UserService implements IUserService {
         user.setPassword(password);
         user.setEmail(email);
         user.setName(name);
-        user.setDateOfBirth(new Date(Long.parseLong(dateOfBirth)));
+        ZonedDateTime dateOfBirthParse = ZonedDateTime.parse(dateOfBirth);
+        user.setDateOfBirth(dateOfBirthParse.toLocalDateTime());
         return userRepository.save(user);
     }
 

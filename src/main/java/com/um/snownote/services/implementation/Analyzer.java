@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.um.snownote.client.HttpClientFactory;
 import com.um.snownote.client.HttpUrl;
-import com.um.snownote.model.Label;
 import com.um.snownote.model.Row;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
@@ -27,7 +26,7 @@ public class Analyzer implements IAnalyzer {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Analyzer.class);
 
     @Override
-    public StructuredData analize(StructuredData structuredData) {
+    public StructuredData analyze(StructuredData structuredData) {
 
         List<Row> rows = structuredData.getRows();
         Map<String, String> labelMap = new HashMap<>();
@@ -62,16 +61,46 @@ public class Analyzer implements IAnalyzer {
     }
 
     public List<String> getLabels(String value, int offset, int limit) {
+
+        List<String> labels;
+
+        if (value.isEmpty() || value.isBlank() || isBoolean(value) || isNumber(value))
+            return new ArrayList<>();
+
+        value = value.replaceAll("[|,;/-]", " ");
+
+        if (value.length() < 3) {
+            value = value + "   ";
+        }
+
+        labels = requestLabel(value, offset, limit);
+
+        return labels;
+
+    }
+
+    private boolean isNumber(String value) {
         try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
-            if (value.isEmpty() || value.isBlank() || isBoolean(value) || isNumber(value))
-                return new ArrayList<>();
+    private boolean isBoolean(String value) {
+        return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false");
+    }
 
+    private List<String> requestLabel(String value, int offset, int limit) {
+
+        try {
 
             HttpClient client = HttpClientFactory.createHttpClient();
             HttpUrl url = HttpClientFactory.getUrls().get("concepts");
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(url.getUrl() + ("?term=" + URLEncoder.encode(value, StandardCharsets.UTF_8) + "&limit=" + limit + "&offset=" + offset)))
+                    .uri(new URI(url.getUrl() + ("?term=" + URLEncoder.encode(value, StandardCharsets.UTF_8) + "&limit=" + limit +
+                            "&offset=" + offset + "&activeFilter=true" + "&termActive=true")))
                     .header("Accept", "application/json")
                     .GET()
                     .build();
@@ -105,19 +134,6 @@ public class Analyzer implements IAnalyzer {
             return new ArrayList<>() {
             };
         }
-    }
 
-    private boolean isNumber(String value) {
-        try {
-            Double.parseDouble(value);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
-
-    private boolean isBoolean(String value) {
-        return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false");
-    }
-
 }

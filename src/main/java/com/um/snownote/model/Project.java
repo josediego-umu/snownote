@@ -4,14 +4,16 @@ import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Document(collection = "projects")
-public class Project {
+public class Project extends AuditData {
     @Id
     private String id;
     private String name;
+    private String description;
     @DBRef
     private StructuredData structuredData;
     @DBRef
@@ -20,6 +22,17 @@ public class Project {
     private List<User> readers;
     @DBRef
     private List<User> writers;
+
+    private String visibility;
+
+    public Project() {
+    }
+
+    public Project(String name, User owner, String description) {
+        this.name = name;
+        this.owner = owner;
+        this.description = description;
+    }
 
     public String getName() {
         return name;
@@ -49,6 +62,14 @@ public class Project {
         return owner;
     }
 
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
     public void setOwner(User owner) {
         this.owner = owner;
     }
@@ -70,15 +91,25 @@ public class Project {
     }
 
     public void addReader(User reader) {
-        readers.add(reader);
+        if (this.readers == null)
+            this.readers = new ArrayList<>();
+
+        if (!this.readers.contains(reader))
+            readers.add(reader);
     }
 
     public void removeReader(User reader) {
+        if (this.readers == null)
+            this.readers = new ArrayList<>();
         readers.remove(reader);
     }
 
     public void addWriter(User writer) {
-        writers.add(writer);
+        if(this.writers == null)
+            this.writers = new ArrayList<>();
+
+        if(!this.writers.contains(writer))
+            this.writers.add(writer);
     }
 
     public void removeWriter(User writer) {
@@ -130,6 +161,14 @@ public class Project {
         writers.clear();
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void addReader(int index, User reader) {
         readers.add(index, reader);
     }
@@ -154,11 +193,11 @@ public class Project {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Project project)) return false;
-        return Objects.equals(getId(), project.getId()) && Objects.equals(getName(), project.getName()) && Objects.equals(getStructuredData(), project.getStructuredData()) && Objects.equals(getOwner(), project.getOwner()) && Objects.equals(getReaders(), project.getReaders()) && Objects.equals(getWriters(), project.getWriters());
+        return Objects.equals(getName(), project.getName()) && Objects.equals(getStructuredData(), project.getStructuredData()) && Objects.equals(getOwner(), project.getOwner()) && Objects.equals(getReaders(), project.getReaders()) && Objects.equals(getWriters(), project.getWriters());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getStructuredData(), getOwner(), getReaders(), getWriters());
+        return Objects.hash(getName(), getStructuredData(), getOwner(), getReaders(), getWriters());
     }
 }

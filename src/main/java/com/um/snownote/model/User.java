@@ -1,20 +1,26 @@
 package com.um.snownote.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Id;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Objects;
 
 @Document(collection = "user")
-public class User {
+public @Data class User extends AuditData {
     @Id
-    String id;
-    String name;
-    String username;
-    String password;
-    String email;
-    Date dateOfBirth;
+    private String id;
+    private String name;
+    private String username;
+    private String password;
+    private String email;
+    private LocalDateTime dateOfBirth;
 
     public User() {
     }
@@ -59,35 +65,23 @@ public class User {
         this.email = email;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDateTime getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDateTime dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User user)) return false;
-        return Objects.equals(getId(), user.getId()) && Objects.equals(getName(), user.getName()) && Objects.equals(getUsername(), user.getUsername()) && Objects.equals(getPassword(), user.getPassword()) && Objects.equals(getEmail(), user.getEmail()) && Objects.equals(getDateOfBirth(), user.getDateOfBirth());
+        return Objects.equals(getName(), user.getName()) && Objects.equals(getUsername(), user.getUsername()) && Objects.equals(getPassword(), user.getPassword()) && Objects.equals(getEmail(), user.getEmail()) && Objects.equals(getDateOfBirth(), user.getDateOfBirth());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getUsername(), getPassword(), getEmail(), getDateOfBirth());
+        return Objects.hash(getName(), getUsername(), getPassword(), getEmail(), getDateOfBirth());
     }
 }
