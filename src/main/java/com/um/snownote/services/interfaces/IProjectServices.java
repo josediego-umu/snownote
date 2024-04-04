@@ -1,6 +1,7 @@
 package com.um.snownote.services.interfaces;
 
 import com.um.snownote.model.Project;
+import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ public interface IProjectServices {
 
     Project createProject(String name, User owner);
 
-    Project createProject(String name, User owner, String description);
+    Project createProject(String name, User owner, String description,String visibility,StructuredData structuredData);
 
     Project updateProject(Project project);
     Project updateProject(Project project, User user);

@@ -27,19 +27,23 @@ public class ProjectServices implements IProjectServices {
         this.structuredDataServices = structuredDataServices;
     }
 
+
     @Override
     public Project createProject(String name, User owner) {
 
-        return createProject(name, owner, null);
+        return createProject(name, owner, null, null, null);
     }
 
     @Override
-    public Project createProject(String name, User owner, String description) {
+    public Project createProject(String name, User owner, String description,String visibility ,StructuredData structuredData) {
 
         Project project = new Project(name, owner, description);
-        StructuredData sd = structuredDataServices.createStructuredData();
 
-        project.setStructuredData(sd);
+        visibility = (visibility == null) ? "private" : visibility;
+        structuredData = (structuredData == null) ? structuredDataServices.createStructuredData() : structuredDataServices.updateStructuredData(structuredData);
+
+        project.setStructuredData(structuredData);
+        project.setVisibility(visibility);
 
         return projectRepository.insert(project);
     }
@@ -93,9 +97,11 @@ public class ProjectServices implements IProjectServices {
     }
 
     @Override
-    public List<Project>getByReaderOrWrite(User user) {
+    public List<Project> getByReaderOrWrite(User user) {
         return projectRepository.findProjectsByReadersOrWriters(user, user);
-    };
+    }
+
+    ;
 
     @Override
     public Boolean deleteProject(String id) {

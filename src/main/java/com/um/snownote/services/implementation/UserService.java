@@ -53,6 +53,12 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User getUserById(String id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+
+    @Override
     public User getUser(String username) {
         return userRepository.findUserByUsername(username);
     }

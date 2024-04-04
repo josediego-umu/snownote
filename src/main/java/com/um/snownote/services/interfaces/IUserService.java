@@ -14,6 +14,8 @@ public interface IUserService {
 
     User register(User user);
 
+    User getUserById(String id);
+
     User getUser(String username);
 
     List<User> getAllUsers();

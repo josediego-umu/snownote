@@ -2,12 +2,18 @@ package com.um.snownote.controller;
 
 
 import com.um.snownote.dto.UserDTO;
+import com.um.snownote.exceptions.LoginException;
+import com.um.snownote.jwtUtils.JwtTokenRequired;
+import com.um.snownote.jwtUtils.JwtUtil;
 import com.um.snownote.mappers.MapperDTO;
 import com.um.snownote.model.User;
 import com.um.snownote.services.interfaces.IUserService;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +21,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
     private final IUserService userService;
     private final MapperDTO mapper = MapperDTO.INSTANCE;
 
@@ -24,25 +32,47 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserDTO login(@RequestBody User user) {
-        return mapper.userToUserDTO(userService.login(user.getUsername(), user.getPassword()));
+    public ResponseEntity<String> login(@RequestBody User userCredentials) {
+
+        User user = userService.login(userCredentials.getUsername(), userCredentials.getPassword());
+        UserDTO userDTO = mapper.userToUserDTO(user);
+
+        if (userDTO == null) {
+
+            throw new LoginException("Invalid username or password");
+        }
+
+        try {
+
+            String token = JwtUtil.generateToken(EXPIRATION_TIME, userDTO);
+
+            return ResponseEntity.ok().header("Authorization", token).body("{ \"token\": \"" + token + "\" }");
+
+        } catch (Exception e) {
+
+            logger.error("Error in login", e);
+        }
+
+
+        return null;
     }
 
-    /*TODO
-    Cambiar el metodo de registro para que reciba un objeto UserDTO y no los parametros por separado, cambiar el formado de fechas a ISO 8601
-     */
+    //Todo comprobar que no exista el usuario
     @PostMapping("/register")
     public User register(@RequestBody User user) {
         return userService.register(user);
     }
 
+    @JwtTokenRequired
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User getUser(@PathVariable String username) {
-        return userService.getUser(username);
+    public UserDTO getUser(@RequestHeader("Authorization") String token, @PathVariable String username) {
+        return mapper.userToUserDTO(userService.getUser(username));
     }
 
     @GetMapping
-    public List<UserDTO> getUsers() {
+    @JwtTokenRequired
+    public List<UserDTO> getUsers(@RequestHeader("Authorization") String token) {
+
         List<User> users = userService.getAllUsers();
         List<UserDTO> userDTOS = new ArrayList<>();
 
@@ -54,9 +84,30 @@ public class UserController {
     }
 
     @PutMapping
-    public UserDTO updateUser(@RequestBody User user) {
+    @JwtTokenRequired
+    public UserDTO updateUser(@RequestHeader("Authorization") String token, @RequestBody User user) {
 
-        return mapper.userToUserDTO(userService.updateUser(user));
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        User userToUpdate = userService.getUser(user.getUsername());
+
+        if (userToUpdate == null) {
+            throw new IllegalArgumentException("User does not exist");
+        }
+
+        userToUpdate.setName(user.getName());
+        userToUpdate.setUsername(user.getUsername());
+        userToUpdate.setEmail(user.getEmail());
+        userToUpdate.setDateOfBirth(user.getDateOfBirth());
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            userToUpdate.setPassword(user.getPassword());
+        }
+
+        return mapper.userToUserDTO(userService.updateUser(userToUpdate));
+
     }
 
 }

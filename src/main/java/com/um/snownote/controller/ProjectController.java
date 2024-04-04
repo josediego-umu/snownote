@@ -1,10 +1,16 @@
 package com.um.snownote.controller;
 
+import com.opencsv.CSVReader;
+import com.um.snownote.jwtUtils.JwtTokenRequired;
+import com.um.snownote.jwtUtils.JwtUtil;
 import com.um.snownote.model.Project;
+import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
+import com.um.snownote.services.implementation.LoaderFileCsv;
 import com.um.snownote.services.interfaces.ILoaderFile;
 import com.um.snownote.services.interfaces.IProjectServices;
 import com.um.snownote.services.interfaces.IUserService;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,9 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.StringWriter;
+import java.io.*;
 import java.util.List;
 
 @RestController
@@ -34,20 +41,24 @@ public class ProjectController {
     }
 
 
-    @PostMapping
-    public Project createProject(String name, String description, String owner) {
+    @PostMapping("/")
+    @JwtTokenRequired
+    public Project createProject(@RequestHeader("Authorization") String token, @RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("visibility") String visibility,@RequestParam("file") MultipartFile file) {
+
         if (name == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is null");
 
-        if (owner == null)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner is null");
+        User userFromToken = JwtUtil.getUserFromToken(token);
 
-        User userOwner = userService.getUser(owner);
+        User userOwner = userService.getUser(userFromToken.getUsername());
+
+        StructuredData structuredData = this.loaderFileCsv.load(file);
 
         if (userOwner == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Owner not found");
 
-        return projectServices.createProject(name, userOwner, description);
+
+        return projectServices.createProject(name, userOwner, description, visibility,structuredData);
     }
 
     @GetMapping("/{id}")
@@ -58,6 +69,7 @@ public class ProjectController {
         return projectServices.getProjectById(id);
 
     }
+
 
     @GetMapping
     public List<Project> getProjects(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "1000") Integer sizePage) {
@@ -129,14 +141,17 @@ public class ProjectController {
     }
 
     @PutMapping
-    public Project updateProject(Project project, String userName) {
+    @JwtTokenRequired
+    public Project updateProject(@RequestHeader("Authorization") String token, Project project) {
         if (project == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Project is null");
 
-        if (userName == null || userName.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is null or empty");
+        User userFromToken = JwtUtil.getUserFromToken(token);
 
-        User user = userService.getUser(userName);
+        if (userFromToken == null)
+            throw new JwtException("Token is invalid");
+
+        User user = userService.getUser(userFromToken.getUsername());
 
         if (user == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not exist");
@@ -145,14 +160,17 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{id}")
-    public Boolean deleteProject(@PathVariable String id, @RequestBody String username) {
+    @JwtTokenRequired
+    public Boolean deleteProject(@RequestHeader("Authorization") String token, @PathVariable String id) {
         if (id == null || id.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Project id is null or empty");
 
-        if (username == null || username.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username is null or empty");
+        User userFromToken = JwtUtil.getUserFromToken(token);
 
-        User user = userService.getUser(username);
+        if (userFromToken == null)
+            throw new JwtException("Token is invalid");
+
+        User user = userService.getUser(userFromToken.getUsername());
 
         if (user == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not exist");
@@ -161,7 +179,8 @@ public class ProjectController {
     }
 
     @PostMapping("/addReader/{id}")
-    public Project addReader(@PathVariable String id, @RequestParam String username) {
+    @JwtTokenRequired
+    public Project addReader(@RequestHeader("Authorization") String token, @PathVariable String id, @RequestParam String username) {
 
         if (id == null || id.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id is null or empty");
@@ -179,10 +198,12 @@ public class ProjectController {
     }
 
     @PostMapping("/addWriter/{id}")
-    public Project addWriter(@PathVariable String id, @RequestParam String username) {
+    @JwtTokenRequired
+    public Project addWriter(@RequestHeader("Authorization") String token, @PathVariable String id, @RequestParam String username) {
 
         if (id == null || id.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id is null or empty");
+
 
         if (username == null || username.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username is null or empty");
@@ -197,7 +218,8 @@ public class ProjectController {
     }
 
     @DeleteMapping("/removeReader/{id}")
-    public Project removeReader(@PathVariable String id, @RequestParam String username) {
+    @JwtTokenRequired
+    public Project removeReader(@RequestHeader("Authorization") String token, @PathVariable String id, @RequestParam String username) {
 
         if (id == null || id.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id is null or empty");
@@ -216,7 +238,8 @@ public class ProjectController {
     }
 
     @DeleteMapping("/removeWriter/{id}")
-    public Project removeWriter(@PathVariable String id, @RequestParam String username) {
+    @JwtTokenRequired
+    public Project removeWriter(@RequestHeader("Authorization") String token, @PathVariable String id, @RequestParam String username) {
 
         if (id == null || id.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id is null or empty");

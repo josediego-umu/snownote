@@ -9,11 +9,9 @@ import com.um.snownote.services.interfaces.ILoaderFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,11 +23,13 @@ public class LoaderFileCsv implements ILoaderFile {
     private static final Logger logger = LoggerFactory.getLogger(LoaderFileCsv.class);
 
     @Override
-    public StructuredData load(String path) {
+    public StructuredData load(MultipartFile file) {
 
         try {
-            Path pathFile = Paths.get(path);
-            return load(pathFile);
+            CSVReader csvReader = new CSVReader(new BufferedReader(new InputStreamReader(file.getInputStream())));
+            ;
+
+            return load(csvReader);
 
         } catch (IOException | CsvValidationException ioe) {
             logger.error(ioe.getMessage(), ioe);
@@ -46,7 +46,7 @@ public class LoaderFileCsv implements ILoaderFile {
 
             StringWriter exportCSV = new StringWriter();
 
-            if(structuredData == null)
+            if (structuredData == null)
                 return exportCSV;
 
             CSVWriter csvWriter = new CSVWriter(exportCSV);
@@ -68,21 +68,17 @@ public class LoaderFileCsv implements ILoaderFile {
     }
 
 
-    private StructuredData load(Path pathFile) throws IOException, CsvValidationException {
+    private StructuredData load(CSVReader csvReader) throws IOException, CsvValidationException {
 
         StructuredData structuredData = new StructuredData();
 
-        try (Reader reader = Files.newBufferedReader(pathFile)) {
-            try (CSVReader csvReader = new CSVReader(reader)) {
-                String[] line;
-                while ((line = csvReader.readNext()) != null) {
-                    structuredData.getRows().add(new Row(List.of(line)));
-                }
-            }
+        String[] line;
+        while ((line = csvReader.readNext()) != null) {
+            structuredData.getRows().add(new Row(List.of(line)));
         }
+
         return structuredData;
     }
-
 
 
 }

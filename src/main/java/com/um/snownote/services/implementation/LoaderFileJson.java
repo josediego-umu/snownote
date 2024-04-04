@@ -6,6 +6,7 @@ import com.um.snownote.services.interfaces.ILoaderFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -24,10 +25,11 @@ public class LoaderFileJson implements ILoaderFile {
     }
 
     @Override
-    public StructuredData load(String path) {
+    public StructuredData load(MultipartFile file) {
+
         try {
-            Path pathFile = Paths.get(path);
-            return load(pathFile);
+
+            return objectMapper.readValue(file.getInputStream(), StructuredData.class);
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -51,10 +53,5 @@ public class LoaderFileJson implements ILoaderFile {
         }
     }
 
-    private StructuredData load(Path pathFile) throws IOException {
-
-        File file = pathFile.toFile();
-        return objectMapper.readValue(file, StructuredData.class);
-    }
 
 }

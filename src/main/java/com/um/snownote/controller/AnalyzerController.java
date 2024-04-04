@@ -1,5 +1,6 @@
 package com.um.snownote.controller;
 
+import com.um.snownote.jwtUtils.JwtTokenRequired;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,8 @@ public class AnalyzerController {
     }
 
     @PostMapping("/project")
-    public StructuredData analyzeProject(StructuredData structuredData) {
+    @JwtTokenRequired
+    public StructuredData analyzeProject(@RequestHeader("Authorization") String token, StructuredData structuredData) {
 
         if (structuredData == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "StructuredData is null");
@@ -30,7 +32,8 @@ public class AnalyzerController {
     }
 
     @GetMapping("/labels")
-    public List<String> getLabels(String value, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer limit) {
+    @JwtTokenRequired
+    public List<String> getLabels(@RequestHeader("Authorization") String token, String value, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer limit) {
 
         if (value == null || value.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "value is null or empty");

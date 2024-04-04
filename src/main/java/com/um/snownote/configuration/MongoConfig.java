@@ -31,7 +31,7 @@ public class MongoConfig {
     public MongoClient mongo() {
 
 
-        ConnectionString connectionString = new ConnectionString("mongodb+srv://snownote:snownote@snownote.ua4gsnu.mongodb.net/?retryWrites=true&w=majority");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://snownote:snownote@snownote.ua4gsnu.mongodb.net/?retryWrites=true&w=majority&appName=SnowNote");
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
                 .build();

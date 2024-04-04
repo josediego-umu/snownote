@@ -1,6 +1,7 @@
 package com.um.snownote.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
@@ -12,16 +13,7 @@ public class JacksonConfiguration {
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
+        mapper.registerModule(new JavaTimeModule());
         return mapper;
     }
-
-    @Bean
-    public ZonedDateTimeWriteConverter zonedDateTimeWriteConverter() {
-        return new ZonedDateTimeWriteConverter();
-    }
-
-    @Bean ZonedDateTimeReadConverter zonedDateTimeReadConverter() {
-        return new ZonedDateTimeReadConverter();
-    }
-
 }
