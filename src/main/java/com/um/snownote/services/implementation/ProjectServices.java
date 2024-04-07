@@ -58,6 +58,7 @@ public class ProjectServices implements IProjectServices {
     public Project updateProject(Project project, User user) {
         project.setUpdateBy(user);
         project.setUpdateDate(new Date());
+        this.structuredDataServices.updateStructuredData(project.getStructuredData());
         return projectRepository.save(project);
     }
 
@@ -119,8 +120,10 @@ public class ProjectServices implements IProjectServices {
         Optional<Project> optionalProject = projectRepository.findById(id);
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
-            updateProject(project, user);
-            return true;
+            if (project.getOwner().equals(user)) {
+                updateProject(project, user);
+                return true;
+            }
         }
         return false;
     }

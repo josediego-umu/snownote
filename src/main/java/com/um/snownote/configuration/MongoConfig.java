@@ -4,24 +4,14 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.jsr310.Jsr310CodecProvider;
-import org.bson.codecs.pojo.PojoCodecProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.um.snownote.annotation.CascadeSaveMongoEventListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.convert.CustomConversions;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import java.util.Collections;
 import java.util.Set;
-
-import static org.bson.codecs.configuration.CodecRegistries.*;
 
 @Configuration
 @EnableMongoRepositories(basePackages = "com.um.snownote.repository")
@@ -64,5 +54,8 @@ public class MongoConfig {
         return mongoTemplate;
     }
 
-
+    @Bean
+    public CascadeSaveMongoEventListener cascadingMongoEventListener() {
+        return new CascadeSaveMongoEventListener();
+    }
 }

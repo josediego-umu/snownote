@@ -1,5 +1,6 @@
 package com.um.snownote.controller;
 
+
 import com.um.snownote.jwtUtils.JwtTokenRequired;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,7 +24,7 @@ public class AnalyzerController {
 
     @PostMapping("/project")
     @JwtTokenRequired
-    public StructuredData analyzeProject(@RequestHeader("Authorization") String token, StructuredData structuredData) {
+    public StructuredData analyzeProject(@RequestHeader("Authorization") String token, @RequestBody StructuredData structuredData) throws IOException {
 
         if (structuredData == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "StructuredData is null");

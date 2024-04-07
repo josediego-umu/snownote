@@ -140,9 +140,9 @@ public class ProjectController {
         return export.toString();
     }
 
-    @PutMapping
+    @PutMapping("/")
     @JwtTokenRequired
-    public Project updateProject(@RequestHeader("Authorization") String token, Project project) {
+    public Project updateProject(@RequestHeader("Authorization") String token, @RequestBody Project project) {
         if (project == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Project is null");
 
