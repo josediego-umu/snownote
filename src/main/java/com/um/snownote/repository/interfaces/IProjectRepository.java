@@ -3,6 +3,7 @@ package com.um.snownote.repository.interfaces;
 import com.um.snownote.model.Project;
 import com.um.snownote.model.User;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -23,5 +24,6 @@ public interface IProjectRepository extends MongoRepository<Project, String>, Pa
     List<Project> findByUpdateDateBetween(Date startDate, Date endDate);
     @Query(value = "db.projects.find({}).skip(?0).limit(?1)", count = true)
     List<Project> findAllPageable(Pageable pageable);
+
 
 }

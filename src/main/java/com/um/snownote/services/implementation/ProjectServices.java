@@ -1,5 +1,6 @@
 package com.um.snownote.services.implementation;
 
+import com.um.snownote.filters.compundFilter;
 import com.um.snownote.model.Project;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -20,11 +23,13 @@ import java.util.Optional;
 public class ProjectServices implements IProjectServices {
     private final IProjectRepository projectRepository;
     private final IStructuredDataServices structuredDataServices;
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public ProjectServices(IProjectRepository projectRepository, IStructuredDataServices structuredDataServices) {
+    public ProjectServices(IProjectRepository projectRepository, IStructuredDataServices structuredDataServices, MongoTemplate mongoTemplate) {
         this.projectRepository = projectRepository;
         this.structuredDataServices = structuredDataServices;
+        this.mongoTemplate = mongoTemplate;
     }
 
 
@@ -174,5 +179,19 @@ public class ProjectServices implements IProjectServices {
             return project;
         }
         return null;
+    }
+
+    public List<Project> filterProjects(compundFilter<Project> filter){
+
+        Query query = new Query();
+
+        if (filter.hasCriteria())
+            query.addCriteria(filter.toCriteria());
+        if (filter.hasSort())
+            query.with(filter.toSort());
+        if (filter.hasPagination())
+            query.with(filter.toPageable());
+
+        return mongoTemplate.find(query, Project.class);
     }
 }

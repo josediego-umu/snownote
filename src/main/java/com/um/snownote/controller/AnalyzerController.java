@@ -35,7 +35,7 @@ public class AnalyzerController {
 
     @GetMapping("/labels")
     @JwtTokenRequired
-    public List<String> getLabels(@RequestHeader("Authorization") String token, String value, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer limit) {
+    public List<String> getLabels(@RequestHeader("Authorization") String token,@RequestParam(name = "value") String value, @RequestParam(required = false, name = "offset") Integer offset, @RequestParam(required = false, name = "limit") Integer limit) {
 
         if (value == null || value.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "value is null or empty");
