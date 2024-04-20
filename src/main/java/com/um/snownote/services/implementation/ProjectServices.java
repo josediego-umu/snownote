@@ -1,6 +1,7 @@
 package com.um.snownote.services.implementation;
 
-import com.um.snownote.filters.compundFilter;
+import com.um.snownote.dto.ProjectDTO;
+import com.um.snownote.filters.CompoundFilter;
 import com.um.snownote.model.Project;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
@@ -9,7 +10,7 @@ import com.um.snownote.services.interfaces.IProjectServices;
 import com.um.snownote.services.interfaces.IStructuredDataServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -181,17 +182,27 @@ public class ProjectServices implements IProjectServices {
         return null;
     }
 
-    public List<Project> filterProjects(compundFilter<Project> filter){
+    public PageImpl<ProjectDTO> filter(CompoundFilter<ProjectDTO> filter){
 
         Query query = new Query();
+        Query countQuery = new Query();
 
-        if (filter.hasCriteria())
+        if (filter.hasCriteria()){
+            countQuery.addCriteria(filter.toCriteria());
             query.addCriteria(filter.toCriteria());
+        }
+
+
+        long totalCount = mongoTemplate.count(countQuery, ProjectDTO.class);
+
         if (filter.hasSort())
             query.with(filter.toSort());
         if (filter.hasPagination())
             query.with(filter.toPageable());
 
-        return mongoTemplate.find(query, Project.class);
+        List<ProjectDTO> result = mongoTemplate.find(query, ProjectDTO.class);
+
+        return new PageImpl<ProjectDTO>(result, filter.toPageable(), totalCount);
+
     }
 }

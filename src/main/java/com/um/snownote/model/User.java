@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Document(collection = "user")
-public @Data class User extends AuditData {
+public @Data class User extends AuditData implements Comparable<User> {
     @Id
     private String id;
     private String name;
@@ -89,5 +90,10 @@ public @Data class User extends AuditData {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getUsername(), getPassword(), getEmail(), getDateOfBirth());
+    }
+
+    @Override
+    public int compareTo(@NotNull User o) {
+        return this.getUsername().compareTo(o.getUsername());
     }
 }

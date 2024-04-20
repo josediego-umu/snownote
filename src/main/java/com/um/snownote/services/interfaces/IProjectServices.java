@@ -1,8 +1,11 @@
 package com.um.snownote.services.interfaces;
 
+import com.um.snownote.dto.ProjectDTO;
+import com.um.snownote.filters.CompoundFilter;
 import com.um.snownote.model.Project;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ public interface IProjectServices {
 
     List<Project> getProjectsByName(String name, Pageable pageable);
     List<Project> getProjectsByUser(User user, Pageable pageable);
+    public PageImpl<ProjectDTO> filter(CompoundFilter<ProjectDTO> filter);
     List<Project> getAllProjects();
     List<Project> getAllProjects(Pageable pageable);
     List<Project>getByReaderOrWrite(User user);

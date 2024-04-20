@@ -2,6 +2,8 @@ package com.um.snownote.filters;
 
 import org.springframework.data.mongodb.core.query.Criteria;
 
+import java.util.regex.Pattern;
+
 public class GenericFilter<T> implements Filter<T> {
     private String attribute;
     private Object value;
@@ -13,7 +15,8 @@ public class GenericFilter<T> implements Filter<T> {
 
     @Override
     public Criteria toCriteria() {
-        return Criteria.where(attribute).is(value);
+        Pattern pattern = Pattern.compile(".*" + value + ".*", Pattern.CASE_INSENSITIVE);
+        return Criteria.where(attribute).regex(pattern);
     }
 
 

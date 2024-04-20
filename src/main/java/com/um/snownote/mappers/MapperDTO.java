@@ -10,7 +10,6 @@ import org.mapstruct.factory.Mappers;
 public interface MapperDTO {
 
     MapperDTO INSTANCE = Mappers.getMapper(MapperDTO.class);
-    //TODO: Terminar el formateo
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")
     @Mapping(source = "username", target = "username")

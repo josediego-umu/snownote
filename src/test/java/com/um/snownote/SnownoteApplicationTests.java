@@ -1,37 +1,32 @@
 package com.um.snownote;
 
+import com.um.snownote.dto.ProjectDTO;
+import com.um.snownote.filters.CompoundFilter;
 import com.um.snownote.filters.Filter;
-import com.um.snownote.filters.SortCriteria;
-import com.um.snownote.filters.compundFilter;
+import com.um.snownote.filters.GenericFilter;
 import com.um.snownote.model.Project;
-import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
 import com.um.snownote.repository.interfaces.IProjectRepository;
-import com.um.snownote.repository.interfaces.IStructuredDataRepository;
 import com.um.snownote.repository.interfaces.IUserRepository;
-import com.um.snownote.services.implementation.LoaderFileCsv;
 import com.um.snownote.services.implementation.ProjectServices;
-import com.um.snownote.services.interfaces.ILoaderFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
 class SnownoteApplicationTests {
     @Autowired
-    private ProjectServices projectServices;
-   /* @Autowired
-    private IUserRepository userRepository;
-    @Autowired
     private IProjectRepository projectRepository;
+    @Autowired
+    private IUserRepository userRepository;
+   /* @Autowired
+
+    @Autowired
+
     @Autowired
     private IStructuredDataRepository structuredDataRepository;
     private final String FILEPATHCSV = "C:\\UM\\TFG\\examples\\patient_hospital_data-RESQformat.csv";
@@ -88,5 +83,21 @@ class SnownoteApplicationTests {
 
     }*/
 
+    @Test
+    public void test() {
 
+        Optional<Project> project = projectRepository.findById("6623b249343c7c70074596bd");
+        User testReader = userRepository.findUserByUsername("testReader");
+        User testWriter = userRepository.findUserByUsername("testWriter");
+
+        if (project.isPresent()) {
+
+            project.get().addReader(testReader);
+            project.get().addWriter(testWriter);
+
+            projectRepository.save(project.get());
+        }
+
+
+    }
 }

@@ -57,7 +57,6 @@ public class UserController {
         return null;
     }
 
-    //Todo comprobar que no exista el usuario
     @PostMapping("/register")
     public User register(@RequestBody User user) {
         return userService.register(user);

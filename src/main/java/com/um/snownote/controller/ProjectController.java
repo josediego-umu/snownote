@@ -1,20 +1,22 @@
 package com.um.snownote.controller;
 
-import com.opencsv.CSVReader;
+import com.um.snownote.dto.ProjectDTO;
+import com.um.snownote.filters.*;
 import com.um.snownote.jwtUtils.JwtTokenRequired;
 import com.um.snownote.jwtUtils.JwtUtil;
 import com.um.snownote.model.Project;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
-import com.um.snownote.services.implementation.LoaderFileCsv;
 import com.um.snownote.services.interfaces.ILoaderFile;
 import com.um.snownote.services.interfaces.IProjectServices;
 import com.um.snownote.services.interfaces.IUserService;
 import io.jsonwebtoken.JwtException;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/project")
@@ -43,7 +46,7 @@ public class ProjectController {
 
     @PostMapping("/")
     @JwtTokenRequired
-    public Project createProject(@RequestHeader("Authorization") String token, @RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("visibility") String visibility,@RequestParam("file") MultipartFile file) {
+    public Project createProject(@RequestHeader("Authorization") String token, @RequestParam("name") String name, @RequestParam("description") String description, @RequestParam("visibility") String visibility, @RequestParam("file") MultipartFile file) {
 
         if (name == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is null");
@@ -58,7 +61,7 @@ public class ProjectController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Owner not found");
 
 
-        return projectServices.createProject(name, userOwner, description, visibility,structuredData);
+        return projectServices.createProject(name, userOwner, description, visibility, structuredData);
     }
 
     @GetMapping("/{id}")
@@ -72,12 +75,66 @@ public class ProjectController {
 
 
     @GetMapping
-    public List<Project> getProjects(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "1000") Integer sizePage) {
-
+    public List<Project> getProjects(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "20") Integer sizePage) {
 
         Pageable pageable = Pageable.ofSize(sizePage).withPage(page);
-
         return projectServices.getAllProjects(pageable);
+
+    }
+
+    @GetMapping("/filter")
+    public PageImpl<ProjectDTO> getFilterProjects(@RequestParam Map<String, String> params, @RequestHeader HttpHeaders headers) {
+
+        CompoundFilter<ProjectDTO> filter = new CompoundFilter<>();
+
+
+        if (params.containsKey("pageSize") && params.containsKey("page")) {
+
+            int page = Integer.parseInt(params.get("page"));
+            int pageSize = Integer.parseInt(params.get("pageSize"));
+
+            params.remove("pageSize");
+            params.remove("page");
+
+            filter.setPagination(new Pagination(page, pageSize));
+        }
+
+        if (params.containsKey("orderField") && params.containsKey("orderDirection")) {
+
+            String orderField = params.get("orderField");
+            String orderDirection = params.get("orderDirection");
+
+            if (!orderField.isEmpty() && !orderDirection.isEmpty()) {
+
+                OrderBy<ProjectDTO> orderBy = new OrderBy<>(orderField, Sort.Direction.valueOf(orderDirection.toUpperCase()));
+
+                filter.addSortCriteria(orderBy);
+            }
+
+            params.remove("orderField");
+            params.remove("orderDirection");
+        }
+
+        if (params.containsKey("visibility")) {
+
+            User user = null;
+
+            try {
+                user = JwtUtil.getUserFromToken(headers.getFirst("Authorization"));
+            } catch (Exception ignored) {
+
+            }
+
+
+            filter.addCriteria(new VisibilityFilter(params.get("visibility"), user));
+            params.remove("visibility");
+        }
+
+        params.forEach((k, v) -> {
+            filter.addCriteria(new GenericFilter<>(k, v));
+        });
+
+        return projectServices.filter(filter);
 
     }
 

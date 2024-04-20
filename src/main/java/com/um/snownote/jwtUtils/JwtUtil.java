@@ -66,6 +66,7 @@ public class JwtUtil {
     }
 
     public static User getUserFromToken(String token) {
+
         Claims claims = validateToken(token);
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.convertValue(claims.get("user"), User.class);

@@ -10,23 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class compundFilter<T> implements Filter<T>, SortCriteria<T>, PageableCustom<T> {
+public class CompoundFilter<T> implements Filter<T>, SortCriteria<T>, PageableCustom<T> {
 
     private final List<Filter<T>> criteriaList;
     private List<SortCriteria<T>> sortCriteriaList;
     private Pagination pagination;
 
-    public compundFilter(List<Filter<T>> criteriaList, List<SortCriteria<T>> sortCriteriaList, Pagination pagination) {
+    public CompoundFilter(List<Filter<T>> criteriaList, List<SortCriteria<T>> sortCriteriaList, Pagination pagination) {
         this.criteriaList = criteriaList;
         this.sortCriteriaList = sortCriteriaList;
         this.pagination = pagination;
     }
 
-    public compundFilter(){
+    public CompoundFilter(){
 
         this.criteriaList = new ArrayList<>();
         this.sortCriteriaList = new ArrayList<>();
-        this.pagination = new Pagination(0,1);
+        this.pagination = new Pagination(0,100);
     }
     public void addCriteria(Filter<T> criteria) {
         criteriaList.add(criteria);
