@@ -87,7 +87,6 @@ public class ProjectController {
 
         CompoundFilter<ProjectDTO> filter = new CompoundFilter<>();
 
-
         if (params.containsKey("pageSize") && params.containsKey("page")) {
 
             int page = Integer.parseInt(params.get("page"));

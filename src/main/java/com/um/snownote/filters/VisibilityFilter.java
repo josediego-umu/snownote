@@ -40,6 +40,9 @@ public class VisibilityFilter implements Filter<ProjectDTO> {
 
     private Criteria getPrivateCriteria() {
 
+        if(user == null)
+            return new Criteria();
+
         ObjectId userId = new ObjectId(user.getId());
 
         return Criteria.where(field).is(privateV)
