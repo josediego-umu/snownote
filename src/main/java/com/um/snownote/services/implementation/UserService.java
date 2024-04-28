@@ -46,7 +46,7 @@ public class UserService implements IUserService {
         User userRecover = userRepository.findUserByUsername(user.getUsername());
 
         if (userRecover != null) {
-            return null;
+            throw new RuntimeException("User already exists");
         }
 
         return userRepository.save(user);

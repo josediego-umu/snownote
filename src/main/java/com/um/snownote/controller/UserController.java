@@ -10,9 +10,12 @@ import com.um.snownote.model.User;
 import com.um.snownote.services.interfaces.IUserService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.ArrayList;
@@ -59,7 +62,25 @@ public class UserController {
 
     @PostMapping("/register")
     public User register(@RequestBody User user) {
-        return userService.register(user);
+
+        if (user.getUsername() == null || user.getUsername().isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username cannot be null or empty");
+        if (user.getPassword() == null || user.getPassword().isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password cannot be null or empty");
+        if (user.getEmail() == null || user.getEmail().isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email cannot be null or empty");
+        if (user.getName() == null || user.getName().isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name cannot be null or empty");
+        if (user.getDateOfBirth() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date of birth cannot be null");
+
+        try {
+            return userService.register(user);
+        } catch (Exception e) {
+            logger.error("Error in register", e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
     }
 
     @JwtTokenRequired
