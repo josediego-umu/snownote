@@ -37,6 +37,11 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody User userCredentials) {
 
+        if (userCredentials.getUsername() == null || userCredentials.getUsername().isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username cannot be empty");
+        if (userCredentials.getPassword() == null || userCredentials.getPassword().isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password cannot be empty");
+
         User user = userService.login(userCredentials.getUsername(), userCredentials.getPassword());
         UserDTO userDTO = mapper.userToUserDTO(user);
 

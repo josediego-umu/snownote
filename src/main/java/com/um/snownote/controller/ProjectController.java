@@ -231,7 +231,13 @@ public class ProjectController {
         if (user == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not exist");
 
-        return projectServices.deleteProject(id, user);
+        try {
+            return projectServices.deleteProject(id, user);
+        } catch (IllegalArgumentException e) {
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
     }
 
     @PostMapping("/addReader/{id}")

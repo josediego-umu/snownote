@@ -127,8 +127,10 @@ public class ProjectServices implements IProjectServices {
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
             if (project.getOwner().equals(user)) {
-                updateProject(project, user);
+                projectRepository.delete(project);
                 return true;
+            } else {
+                throw new IllegalArgumentException("User is not the owner of the project");
             }
         }
         return false;
