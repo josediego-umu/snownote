@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.Id;
-import lombok.Data;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Document(collection = "user")
-public @Data class User extends AuditData implements Comparable<User> {
+public class User extends AuditData implements Comparable<User> {
     @Id
     private String id;
     private String name;

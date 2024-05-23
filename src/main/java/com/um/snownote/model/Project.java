@@ -14,7 +14,7 @@ public class Project extends AuditData {
     private String id;
     private String name;
     private String description;
-    @DBRef
+
     private StructuredData structuredData;
     @DBRef
     private User owner;
