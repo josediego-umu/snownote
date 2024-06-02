@@ -25,5 +25,4 @@ public interface IProjectRepository extends MongoRepository<Project, String>, Pa
     @Query(value = "db.projects.find({}).skip(?0).limit(?1)", count = true)
     List<Project> findAllPageable(Pageable pageable);
 
-
 }

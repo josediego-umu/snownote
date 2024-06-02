@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.um.snownote.client.HttpClientFactory;
 import com.um.snownote.client.HttpUrl;
-import com.um.snownote.model.Row;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
 import org.slf4j.LoggerFactory;
@@ -28,35 +27,26 @@ public class Analyzer implements IAnalyzer {
     @Override
     public StructuredData analyze(StructuredData structuredData) {
 
-        List<Row> rows = structuredData.getRows();
+        List<List<String>> rows = structuredData.getRows();
         Map<String, String> labelMap = new HashMap<>();
 
-        for (int i = 1; i < rows.size(); i++) {
+        for (List<String> row : rows) {
 
-            Row row = rows.get(i);
-            List<String> labelsValue = new ArrayList<>();
-            for (int j = 0; j < row.getValuesRow().size(); j++) {
-                String label = "";
+            for (String value : row) {
 
-                if (labelMap.get(row.getValue(j)) == null || labelMap.get(row.getValue(j)).isEmpty()) {
-                    List<String> labels = getLabels(row.getValue(j), 0, 1);
+                if (labelMap.get(value) == null || labelMap.get(value).isEmpty()) {
+                    List<String> labels = getLabels(value, 0, 1);
                     if (!labels.isEmpty()) {
-                        label = labels.get(0);
-                        labelMap.put(row.getValue(j), label);
+                        String label = labels.get(0);
+                        labelMap.put(value, label);
                     }
-
-                } else {
-                    label = labelMap.get(row.getValue(j));
                 }
-
-
-                labelsValue.add(label);
-
             }
 
-            row.setLabeledRow(labelsValue);
+
         }
 
+        structuredData.setLabels(labelMap);
         return structuredData;
     }
 

@@ -9,17 +9,11 @@ import java.util.List;
 public interface IUserService {
 
     User login(String username, String password);
-
     User register(String username, String password, String email, String name, String dateOfBirth);
-
     User register(User user);
-
     User getUserById(String id);
-
     User getUser(String username);
-
     List<User> getAllUsers();
-
     User updateUser(User user);
 
 }

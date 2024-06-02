@@ -2,7 +2,7 @@ package com.um.snownote.services.interfaces;
 
 import com.um.snownote.model.StructuredData;
 
-//TODO implement here
+
 public interface IStructuredDataServices {
 
     StructuredData createStructuredData();

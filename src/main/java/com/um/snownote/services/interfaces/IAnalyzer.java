@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-//TODO implement here
 @Service
 public interface IAnalyzer {
 

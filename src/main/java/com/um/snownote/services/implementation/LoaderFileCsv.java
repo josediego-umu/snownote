@@ -3,7 +3,6 @@ package com.um.snownote.services.implementation;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
-import com.um.snownote.model.Row;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.ILoaderFile;
 import org.slf4j.Logger;
@@ -12,10 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 @Service("LoaderFileCsv")
 public class LoaderFileCsv implements ILoaderFile {
@@ -50,10 +47,17 @@ public class LoaderFileCsv implements ILoaderFile {
                 return exportCSV;
 
             CSVWriter csvWriter = new CSVWriter(exportCSV);
-            List<Row> rows = structuredData.getRows();
-            for (Row row : rows) {
+            List<List<String>> rows = structuredData.getRows();
+            Map<String,String> label = structuredData.getLabels();
 
-                csvWriter.writeNext(row.getValueLabel().toArray(new String[0]));
+            for (List<String> row : rows) {
+
+               String[] csvRow = (String[]) row.stream()
+                        .map( value -> label.get(value) != null ? value +  label.get(value) : value)
+                        .toArray();
+
+                csvWriter.writeNext(csvRow);
+
             }
 
             csvWriter.close();
@@ -74,7 +78,7 @@ public class LoaderFileCsv implements ILoaderFile {
 
         String[] line;
         while ((line = csvReader.readNext()) != null) {
-            structuredData.getRows().add(new Row(List.of(line)));
+            structuredData.getRows().add(List.of(line));
         }
 
         return structuredData;

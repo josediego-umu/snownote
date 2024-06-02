@@ -50,6 +50,9 @@ public class MongoConfig {
             mongoTemplate.createCollection("projects");
         }
 
+        if (!colleSet.contains("ontologies")) {
+            mongoTemplate.createCollection("ontologies");
+        }
 
         return mongoTemplate;
     }

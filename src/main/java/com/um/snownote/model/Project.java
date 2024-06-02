@@ -1,11 +1,13 @@
 package com.um.snownote.model;
 
 import jakarta.persistence.Id;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Document(collection = "projects")
@@ -14,8 +16,11 @@ public class Project extends AuditData {
     private String id;
     private String name;
     private String description;
-
     private StructuredData structuredData;
+    private Map<ObjectId, String> ontologies;
+    private ObjectId activeOntologyId;
+    private List<HistoryEntry> historyEntries;
+
     @DBRef
     private User owner;
     @DBRef
@@ -88,6 +93,30 @@ public class Project extends AuditData {
 
     public void setWriters(List<User> writers) {
         this.writers = writers;
+    }
+
+    public Map<ObjectId, String> getOntologies() {
+        return ontologies;
+    }
+
+    public void setOntologies(Map<ObjectId, String> ontologies) {
+        this.ontologies = ontologies;
+    }
+
+    public ObjectId getActiveOntologyId() {
+        return activeOntologyId;
+    }
+
+    public void setActiveOntologyId(ObjectId activeOntologyId) {
+        this.activeOntologyId = activeOntologyId;
+    }
+
+    public List<HistoryEntry> getHistoryEntries() {
+        return historyEntries;
+    }
+
+    public void setHistoryEntries(List<HistoryEntry> historyEntries) {
+        this.historyEntries = historyEntries;
     }
 
     public void addReader(User reader) {
