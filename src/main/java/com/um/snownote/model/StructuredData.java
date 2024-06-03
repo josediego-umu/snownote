@@ -89,6 +89,10 @@ public class StructuredData extends AuditData {
         return this.labels.containsKey(key);
     }
 
+    public boolean isEmpty() {
+        return this.rows.isEmpty();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

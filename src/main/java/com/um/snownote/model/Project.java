@@ -141,6 +141,8 @@ public class Project extends AuditData {
             this.writers.add(writer);
     }
 
+
+
     public void removeWriter(User writer) {
         writers.remove(writer);
     }
