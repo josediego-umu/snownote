@@ -9,7 +9,6 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.formats.RDFJsonLDDocumentFormat;
 import org.semanticweb.owlapi.io.StreamDocumentSource;
 import org.semanticweb.owlapi.io.StringDocumentSource;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -20,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 @Service
 public class OntologyService implements IOntologyService {
@@ -75,16 +73,16 @@ public class OntologyService implements IOntologyService {
     }
 
     @Override
-    public OWLOntologyManager getOntologyManager(Ontology ontology) throws OWLOntologyCreationException {
+    public OWLOntology getOntology(Ontology ontology) throws OWLOntologyCreationException {
 
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        manager.loadOntologyFromOntologyDocument(new StringDocumentSource(ontology.getData()));
+        return manager.loadOntologyFromOntologyDocument(new StringDocumentSource(ontology.getData()));
 
-        return manager;
+
     }
 
     @Override
-    public OWLOntologyManager getOntologyManagerById(String id) {
+    public OWLOntology getOntologyById(String id) {
         Ontology ontology = this.ontologyRepository.findById(id).orElse(null);
 
         if (ontology == null) {
@@ -92,7 +90,7 @@ public class OntologyService implements IOntologyService {
         }
 
         try {
-            return getOntologyManager(ontology);
+            return getOntology(ontology);
         } catch (OWLOntologyCreationException e) {
             logger.error(e.getMessage(), e);
             return null;

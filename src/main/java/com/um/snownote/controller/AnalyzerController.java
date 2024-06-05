@@ -29,7 +29,7 @@ public class AnalyzerController {
         if (structuredData == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "StructuredData is null");
 
-        return analyzer.analyze(structuredData);
+        return analyzer.analyze(structuredData, null);
 
     }
 
@@ -44,7 +44,7 @@ public class AnalyzerController {
 
         if (limit == null) limit = 10;
 
-        return analyzer.getLabels(value, offset, limit);
+        return analyzer.getLabels(value, offset, limit, null);
 
     }
 

@@ -1,21 +1,16 @@
 package com.um.snownote;
 
-import com.mongodb.client.gridfs.model.GridFSFile;
 import com.um.snownote.model.Ontology;
 import com.um.snownote.services.interfaces.IFileService;
 import com.um.snownote.services.interfaces.IOntologyService;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.semanticweb.owlapi.formats.RDFJsonLDDocumentFormat;
-import org.semanticweb.owlapi.io.StringDocumentSource;
 import org.semanticweb.owlapi.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -112,9 +107,9 @@ public class Test {
         Assertions.assertEquals("koala", ontology.getName());
         Assertions.assertNotNull(ontology.getData());
 
-        OWLOntologyManager manager =  this.ontologyService.getOntologyManager(ontology);
+        OWLOntology owlOntology =  this.ontologyService.getOntology(ontology);
 
-        Assertions.assertNotNull(manager);
+        Assertions.assertNotNull(owlOntology);
 
 
     }

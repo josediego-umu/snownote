@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.um.snownote.client.HttpClientFactory;
 import com.um.snownote.client.HttpUrl;
+import com.um.snownote.model.Ontology;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class Analyzer implements IAnalyzer {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Analyzer.class);
+public class AnalyzerSnowedCT implements IAnalyzer {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AnalyzerSnowedCT.class);
 
     @Override
-    public StructuredData analyze(StructuredData structuredData) {
+    public StructuredData analyze(StructuredData structuredData, Ontology ontology) {
 
         List<List<String>> rows = structuredData.getRows();
         Map<String, String> labelMap = new HashMap<>();
@@ -35,7 +36,7 @@ public class Analyzer implements IAnalyzer {
             for (String value : row) {
 
                 if (labelMap.get(value) == null || labelMap.get(value).isEmpty()) {
-                    List<String> labels = getLabels(value, 0, 1);
+                    List<String> labels = getLabels(value, 0, 1, null);
                     if (!labels.isEmpty()) {
                         String label = labels.get(0);
                         labelMap.put(value, label);
@@ -50,7 +51,7 @@ public class Analyzer implements IAnalyzer {
         return structuredData;
     }
 
-    public List<String> getLabels(String value, int offset, int limit) {
+    public List<String> getLabels(String value, int offset, int limit, Ontology ontology) {
 
         List<String> labels;
 

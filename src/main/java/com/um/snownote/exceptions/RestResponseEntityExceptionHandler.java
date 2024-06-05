@@ -1,6 +1,6 @@
 package com.um.snownote.exceptions;
 
-import com.um.snownote.services.implementation.Analyzer;
+import com.um.snownote.services.implementation.AnalyzerSnowedCT;
 import io.jsonwebtoken.JwtException;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.logging.Logger;
-
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Analyzer.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AnalyzerSnowedCT.class);
 
     @ExceptionHandler(value = {JwtException.class})
     public ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
