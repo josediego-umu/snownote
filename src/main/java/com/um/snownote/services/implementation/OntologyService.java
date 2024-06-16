@@ -42,6 +42,7 @@ public class OntologyService implements IOntologyService {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(file.getBytes());
             OWLOntology owlOntology = manager.loadOntologyFromOntologyDocument(new StreamDocumentSource(inputStream));
 
+
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             manager.saveOntology(owlOntology, new RDFJsonLDDocumentFormat(), outputStream);
 

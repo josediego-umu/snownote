@@ -5,10 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Document(collection = "projects")
 public class Project extends AuditData {
@@ -17,8 +14,8 @@ public class Project extends AuditData {
     private String name;
     private String description;
     private StructuredData structuredData;
-    private Map<ObjectId, String> ontologies;
-    private ObjectId activeOntologyId;
+    private Map<String, String> ontologies;
+    private String activeOntologyId;
     private List<HistoryEntry> historyEntries;
 
     @DBRef
@@ -37,6 +34,9 @@ public class Project extends AuditData {
         this.name = name;
         this.owner = owner;
         this.description = description;
+        this.historyEntries = new ArrayList<>();
+        this.ontologies = new HashMap<>();
+
     }
 
     public String getName() {
@@ -95,19 +95,19 @@ public class Project extends AuditData {
         this.writers = writers;
     }
 
-    public Map<ObjectId, String> getOntologies() {
+    public Map<String , String> getOntologies() {
         return ontologies;
     }
 
-    public void setOntologies(Map<ObjectId, String> ontologies) {
+    public void setOntologies(Map<String, String> ontologies) {
         this.ontologies = ontologies;
     }
 
-    public ObjectId getActiveOntologyId() {
+    public String getActiveOntologyId() {
         return activeOntologyId;
     }
 
-    public void setActiveOntologyId(ObjectId activeOntologyId) {
+    public void setActiveOntologyId(String activeOntologyId) {
         this.activeOntologyId = activeOntologyId;
     }
 

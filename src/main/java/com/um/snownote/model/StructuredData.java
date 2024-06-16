@@ -1,6 +1,9 @@
 package com.um.snownote.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.um.snownote.mappers.MapSetSerializer;
+import com.um.snownote.mappers.MapStringSerializer;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,12 +15,16 @@ public class StructuredData extends AuditData {
     @Id
     private String id;
     private List<List<String>> rows;
-
+    @JsonSerialize(using = MapSetSerializer.class)
+    private Map<String,Set<String>> columnsToValues;
+    @JsonSerialize(using = MapStringSerializer.class)
     private Map<String, String> labels;
 
     public StructuredData() {
+
         this.rows = new ArrayList<>();
         this.labels = new HashMap<>();
+        this.columnsToValues = new HashMap<>();
     }
 
     public String getId() {
@@ -91,6 +98,14 @@ public class StructuredData extends AuditData {
 
     public boolean isEmpty() {
         return this.rows.isEmpty();
+    }
+
+    public Map<String, Set<String>> getColumnsToValues() {
+        return columnsToValues;
+    }
+
+    public void setColumnsToValues(Map<String, Set<String>> columnsToValues) {
+        this.columnsToValues = columnsToValues;
     }
 
     @Override

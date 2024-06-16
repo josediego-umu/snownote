@@ -1,13 +1,17 @@
 package com.um.snownote.services.implementation;
 
+import com.um.snownote.constants.Constant;
 import com.um.snownote.dto.ProjectDTO;
 import com.um.snownote.filters.CompoundFilter;
+import com.um.snownote.model.Ontology;
 import com.um.snownote.model.Project;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
+import com.um.snownote.repository.interfaces.IOntologyRepository;
 import com.um.snownote.repository.interfaces.IProjectRepository;
 import com.um.snownote.services.interfaces.IProjectServices;
 import com.um.snownote.services.interfaces.IStructuredDataServices;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,12 +27,15 @@ import java.util.Optional;
 @Service
 public class ProjectServices implements IProjectServices {
     private final IProjectRepository projectRepository;
+
+    private final IOntologyRepository ontologyRepository;
     private final IStructuredDataServices structuredDataServices;
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public ProjectServices(IProjectRepository projectRepository, IStructuredDataServices structuredDataServices, MongoTemplate mongoTemplate) {
+    public ProjectServices(IProjectRepository projectRepository, IOntologyRepository ontologyRepository, IStructuredDataServices structuredDataServices, MongoTemplate mongoTemplate) {
         this.projectRepository = projectRepository;
+        this.ontologyRepository = ontologyRepository;
         this.structuredDataServices = structuredDataServices;
         this.mongoTemplate = mongoTemplate;
     }
@@ -41,7 +48,7 @@ public class ProjectServices implements IProjectServices {
     }
 
     @Override
-    public Project createProject(String name, User owner, String description,String visibility ,StructuredData structuredData) {
+    public Project createProject(String name, User owner, String description, String visibility, StructuredData structuredData) {
 
         Project project = new Project(name, owner, description);
 
@@ -50,6 +57,13 @@ public class ProjectServices implements IProjectServices {
 
         project.setStructuredData(structuredData);
         project.setVisibility(visibility);
+
+        List<Ontology> ontologies = ontologyRepository.findByName(Constant.DEFAULT_ONTOLOGY);
+
+        if (!ontologies.isEmpty()) {
+            project.getOntologies().put(ontologies.get(0).getId(), Constant.DEFAULT_ONTOLOGY);
+            project.setActiveOntologyId(ontologies.get(0).getId());
+        }
 
         return projectRepository.insert(project);
     }
@@ -184,12 +198,12 @@ public class ProjectServices implements IProjectServices {
         return null;
     }
 
-    public PageImpl<ProjectDTO> filter(CompoundFilter<ProjectDTO> filter){
+    public PageImpl<ProjectDTO> filter(CompoundFilter<ProjectDTO> filter) {
 
         Query query = new Query();
         Query countQuery = new Query();
 
-        if (filter.hasCriteria()){
+        if (filter.hasCriteria()) {
             countQuery.addCriteria(filter.toCriteria());
             query.addCriteria(filter.toCriteria());
         }

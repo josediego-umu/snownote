@@ -16,14 +16,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@Service
-public class AnalyzerSnowedCT implements IAnalyzer {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AnalyzerSnowedCT.class);
+@Service("AnalyzerSnowedCT")
+public class SnowedCTAnalyzer implements IAnalyzer {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SnowedCTAnalyzer.class);
 
     @Override
     public StructuredData analyze(StructuredData structuredData, Ontology ontology) {
@@ -31,11 +28,21 @@ public class AnalyzerSnowedCT implements IAnalyzer {
         List<List<String>> rows = structuredData.getRows();
         Map<String, String> labelMap = new HashMap<>();
 
-        for (List<String> row : rows) {
+        structuredData.setColumnsToValues(columnsToValueInit(rows.get(0)));
 
-            for (String value : row) {
+        for (int i = 1; i < rows.size(); i++) {
 
-                if (labelMap.get(value) == null || labelMap.get(value).isEmpty()) {
+            for (int j = 0; j < rows.get(i).size(); j++) {
+
+                String value = rows.get(i).get(j);
+
+                if (!value.isEmpty() && !isNumber(value)) {
+
+                    structuredData.getColumnsToValues().get(structuredData.getRows().get(0).get(j)).add(value);
+                }
+
+                if (!value.isEmpty() && labelMap.get(value) == null) {
+
                     List<String> labels = getLabels(value, 0, 1, null);
                     if (!labels.isEmpty()) {
                         String label = labels.get(0);
@@ -43,7 +50,6 @@ public class AnalyzerSnowedCT implements IAnalyzer {
                     }
                 }
             }
-
 
         }
 
@@ -55,7 +61,8 @@ public class AnalyzerSnowedCT implements IAnalyzer {
 
         List<String> labels;
 
-        if (value.isEmpty() || value.isBlank() || isBoolean(value) || isNumber(value))
+        if (value.isEmpty() || value.isBlank() || isBoolean(value) || isNumber(value)
+                || isDate(value) || haveDot(value))
             return new ArrayList<>();
 
         value = value.replaceAll("[|,;/-]", " ");
@@ -71,6 +78,19 @@ public class AnalyzerSnowedCT implements IAnalyzer {
     }
 
     private boolean isNumber(String value) {
+        return isFloat(value) || isDouble(value);
+    }
+
+    private boolean isFloat(String value) {
+        try {
+            Float.parseFloat(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isDouble(String value) {
         try {
             Double.parseDouble(value);
             return true;
@@ -83,9 +103,19 @@ public class AnalyzerSnowedCT implements IAnalyzer {
         return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false");
     }
 
+    private boolean isDate(String value) {
+        return value.matches("\\d{4}-\\d{2}-\\d{2}");
+    }
+
+    private boolean haveDot(String value) {
+        return value.contains(".") || value.contains(",") || value.contains(";");
+    }
+
     private List<String> requestLabel(String value, int offset, int limit) {
 
         try {
+
+            List<String> labels = new ArrayList<>();
 
             HttpClient client = HttpClientFactory.createHttpClient();
             HttpUrl url = HttpClientFactory.getUrls().get("concepts");
@@ -105,7 +135,7 @@ public class AnalyzerSnowedCT implements IAnalyzer {
 
                 JsonNode responseJson = Mapper.readTree(response.body());
                 JsonNode itemsArray = responseJson.get("items");
-                List<String> labels = new ArrayList<>();
+
 
                 if (itemsArray.isArray()) {
                     for (JsonNode item : itemsArray) {
@@ -114,11 +144,12 @@ public class AnalyzerSnowedCT implements IAnalyzer {
                     }
                 }
 
-
-                return labels;
             }
 
-            return new ArrayList<>();
+            if (labels.isEmpty())
+                labels.add("");
+
+            return labels;
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -127,4 +158,15 @@ public class AnalyzerSnowedCT implements IAnalyzer {
         }
 
     }
+
+    private HashMap<String, Set<String>> columnsToValueInit(List<String> header) {
+        HashMap<String, Set<String>> columnsToValues = new HashMap<>();
+
+        for (String column : header) {
+            columnsToValues.put(column, new HashSet<>());
+        }
+
+        return columnsToValues;
+    }
+
 }

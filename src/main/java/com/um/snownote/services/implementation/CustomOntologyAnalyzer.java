@@ -10,18 +10,19 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 
-@Service
-public class AnalyzerCustomOntology implements IAnalyzer {
+@Service("AnalyzerCustomOntology")
+public class CustomOntologyAnalyzer implements IAnalyzer {
     private final IOntologyService ontologyService;
     private final OntologyCache ontologyCache;
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AnalyzerCustomOntology.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(CustomOntologyAnalyzer.class);
 
 
     @Autowired
-    public AnalyzerCustomOntology(IOntologyService ontologyService) {
+    public CustomOntologyAnalyzer(IOntologyService ontologyService) {
         this.ontologyService = ontologyService;
         this.ontologyCache = OntologyCache.getInstance();
     }
@@ -64,11 +65,16 @@ public class AnalyzerCustomOntology implements IAnalyzer {
         if (owlOntology == null)
             return null;
 
-        List<String> labels = owlOntology.getIndividualsInSignature().stream()
-                .filter(individual -> individual.getIRI().getFragment().contains(value))
-                .skip((long) Math.max(0, offset - 1) * limit)
+
+        List<String> labels = owlOntology.getClassesInSignature().stream()
+                .filter(owlClass -> {
+                    System.out.println(owlClass.getIRI().getFragment().toUpperCase());
+                    return owlClass.getIRI().getFragment().toUpperCase().contains(value.toUpperCase());
+
+                })
+                .skip((long) Math.max(0, (offset - 1)) * limit)
                 .limit(limit)
-                .map(individual -> individual.getIRI().getFragment())
+                .map(owlClass -> owlClass.getIRI().getFragment())
                 .toList();
 
         return labels;
@@ -85,16 +91,11 @@ public class AnalyzerCustomOntology implements IAnalyzer {
             return owlOntology;
 
 
-        try {
-            owlOntology = ontologyService.getOntology(ontology);
+        owlOntology = ontologyService.getOntologyById(ontology.getId());
 
-            ontologyCache.addObject(ontology.getId(), owlOntology);
+        ontologyCache.addObject(ontology.getId(), owlOntology);
 
-            return owlOntology;
-        } catch (OWLOntologyCreationException e) {
-            logger.error("Error in getOntology", e);
-            return null;
-        }
+        return owlOntology;
 
 
     }
