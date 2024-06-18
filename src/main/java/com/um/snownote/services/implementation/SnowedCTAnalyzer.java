@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.um.snownote.client.HttpClientFactory;
 import com.um.snownote.client.HttpUrl;
+import com.um.snownote.model.LabelSummary;
 import com.um.snownote.model.Ontology;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
@@ -43,7 +44,7 @@ public class SnowedCTAnalyzer implements IAnalyzer {
 
                 if (!value.isEmpty() && labelMap.get(value) == null) {
 
-                    List<String> labels = getLabels(value, 0, 1, null);
+                    List<String> labels = getLabels(value, 0, 1, null).getLabels();
                     if (!labels.isEmpty()) {
                         String label = labels.get(0);
                         labelMap.put(value, label);
@@ -57,13 +58,14 @@ public class SnowedCTAnalyzer implements IAnalyzer {
         return structuredData;
     }
 
-    public List<String> getLabels(String value, int offset, int limit, Ontology ontology) {
+    public LabelSummary getLabels(String value, int offset, int limit, Ontology ontology) {
 
-        List<String> labels;
+        LabelSummary labels;
 
         if (value.isEmpty() || value.isBlank() || isBoolean(value) || isNumber(value)
                 || isDate(value) || haveDot(value))
-            return new ArrayList<>();
+            return new LabelSummary() {
+            };
 
         value = value.replaceAll("[|,;/-]", " ");
 
@@ -111,11 +113,14 @@ public class SnowedCTAnalyzer implements IAnalyzer {
         return value.contains(".") || value.contains(",") || value.contains(";");
     }
 
-    private List<String> requestLabel(String value, int offset, int limit) {
+    private LabelSummary requestLabel(String value, int offset, int limit) {
+
+        List<String> labels = new ArrayList<>();
+        int total = 0;
 
         try {
 
-            List<String> labels = new ArrayList<>();
+
 
             HttpClient client = HttpClientFactory.createHttpClient();
             HttpUrl url = HttpClientFactory.getUrls().get("concepts");
@@ -134,6 +139,9 @@ public class SnowedCTAnalyzer implements IAnalyzer {
                 ObjectMapper Mapper = new ObjectMapper();
 
                 JsonNode responseJson = Mapper.readTree(response.body());
+
+                total = responseJson.get("total").asInt();
+
                 JsonNode itemsArray = responseJson.get("items");
 
 
@@ -149,11 +157,13 @@ public class SnowedCTAnalyzer implements IAnalyzer {
             if (labels.isEmpty())
                 labels.add("");
 
-            return labels;
+            LabelSummary labelSummary = new LabelSummary(labels, total);
+
+            return labelSummary;
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return new ArrayList<>() {
+            return new LabelSummary() {
             };
         }
 

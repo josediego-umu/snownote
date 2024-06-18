@@ -2,6 +2,7 @@ package com.um.snownote.controller;
 
 
 import com.um.snownote.jwtUtils.JwtTokenRequired;
+import com.um.snownote.model.LabelSummary;
 import com.um.snownote.model.Ontology;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
@@ -44,7 +45,7 @@ public class AnalyzerController {
 
     @GetMapping("/labels")
     //@JwtTokenRequired
-    public List<String> getLabels(@RequestHeader("Authorization") String token, @RequestParam(name = "value") String value,
+    public LabelSummary getLabels(@RequestHeader("Authorization") String token, @RequestParam(name = "value") String value,
                                   @RequestParam(required = false, name = "offset") Integer offset, @RequestParam(required = false, name = "limit") Integer limit, Ontology ontology) {
 
         if (value == null || value.isEmpty())

@@ -1,17 +1,19 @@
 package com.um.snownote.services.implementation;
 
 import com.um.snownote.cache.OntologyCache;
+import com.um.snownote.model.LabelSummary;
 import com.um.snownote.model.Ontology;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
 import com.um.snownote.services.interfaces.IOntologyService;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service("AnalyzerCustomOntology")
@@ -41,7 +43,7 @@ public class CustomOntologyAnalyzer implements IAnalyzer {
         for (List<String> row : rows) {
             for (String value : row) {
                 if (value != null && !value.isEmpty()) {
-                    List<String> labels = getLabels(value, 0, 1, null);
+                    List<String> labels = getLabels(value, 0, 1, null).getLabels();
                     if (!labels.isEmpty()) {
                         String label = labels.get(0);
                         structuredData.getLabels().put(value, label);
@@ -54,7 +56,10 @@ public class CustomOntologyAnalyzer implements IAnalyzer {
     }
 
     @Override
-    public List<String> getLabels(String value, int offset, int limit, Ontology ontology) {
+    public LabelSummary getLabels(String value, int offset, int limit, Ontology ontology) {
+
+        LabelSummary labelSummary = new LabelSummary();
+        int totalLabels = 0;
 
         if (value == null || value.isEmpty())
             return null;
@@ -66,18 +71,25 @@ public class CustomOntologyAnalyzer implements IAnalyzer {
             return null;
 
 
-        List<String> labels = owlOntology.getClassesInSignature().stream()
+        List<OWLEntity> filters = owlOntology.getClassesInSignature().stream()
                 .filter(owlClass -> {
                     System.out.println(owlClass.getIRI().getFragment().toUpperCase());
                     return owlClass.getIRI().getFragment().toUpperCase().contains(value.toUpperCase());
 
-                })
+                }).collect(Collectors.toList());
+
+        totalLabels = filters.size();
+
+        List<String> labels = filters.stream()
                 .skip((long) Math.max(0, (offset - 1)) * limit)
                 .limit(limit)
                 .map(owlClass -> owlClass.getIRI().getFragment())
                 .toList();
 
-        return labels;
+        labelSummary.setLabels(labels);
+        labelSummary.setTotalLabels(totalLabels);
+
+        return labelSummary;
 
 
     }
