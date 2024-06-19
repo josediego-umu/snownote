@@ -115,7 +115,7 @@ public class Test {
         Assertions.assertEquals("koala", ontology.getName());
         Assertions.assertNotNull(ontology.getData());
 
-        OWLOntology owlOntology = this.ontologyService.getOntology(ontology);
+        OWLOntology owlOntology = this.ontologyService.getOwlOntology(ontology);
 
         Assertions.assertNotNull(owlOntology);
 
@@ -142,7 +142,7 @@ public class Test {
                     Assertions.assertEquals(file.getName(), ontology.getName());
                     Assertions.assertNotNull(ontology.getData());
 
-                    OWLOntology owlOntology = this.ontologyService.getOntology(ontology);
+                    OWLOntology owlOntology = this.ontologyService.getOwlOntology(ontology);
 
                     Assertions.assertNotNull(owlOntology);
 
@@ -162,7 +162,7 @@ public class Test {
         ontology.setName("test");
         ontology.setId("66649850c1c8363a1a25c705");
 
-        analyzerController.getLabels(null,"female",1,10,ontology);
+        analyzerController.getLabels(null,"female",1,10,ontology.getId());
 
     }
 

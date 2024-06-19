@@ -67,6 +67,10 @@ public class OntologyService implements IOntologyService {
 
 
     }
+    @Override
+    public Ontology getOntologyById(String id) {
+        return this.ontologyRepository.findById(id).orElse(null);
+    }
 
     @Override
     public Ontology save(Ontology ontology) {
@@ -74,7 +78,7 @@ public class OntologyService implements IOntologyService {
     }
 
     @Override
-    public OWLOntology getOntology(Ontology ontology) throws OWLOntologyCreationException {
+    public OWLOntology getOwlOntology(Ontology ontology) throws OWLOntologyCreationException {
 
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         return manager.loadOntologyFromOntologyDocument(new StringDocumentSource(ontology.getData()));
@@ -83,7 +87,7 @@ public class OntologyService implements IOntologyService {
     }
 
     @Override
-    public OWLOntology getOntologyById(String id) {
+    public OWLOntology getOwlOntologyById(String id) {
         Ontology ontology = this.ontologyRepository.findById(id).orElse(null);
 
         if (ontology == null) {
@@ -91,7 +95,7 @@ public class OntologyService implements IOntologyService {
         }
 
         try {
-            return getOntology(ontology);
+            return getOwlOntology(ontology);
         } catch (OWLOntologyCreationException e) {
             logger.error(e.getMessage(), e);
             return null;

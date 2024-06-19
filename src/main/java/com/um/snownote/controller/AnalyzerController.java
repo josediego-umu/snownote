@@ -6,6 +6,7 @@ import com.um.snownote.model.LabelSummary;
 import com.um.snownote.model.Ontology;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
+import com.um.snownote.services.interfaces.IOntologyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -19,21 +20,25 @@ import java.util.List;
 @RequestMapping("/analyzer")
 public class AnalyzerController {
     private final IAnalyzer snomedAnalyzer;
+    private final IOntologyService ontologyService;
     private final IAnalyzer customOntologyAnalyzer;
     private final String DEFAULT_ONTOLOGY = "SNOMED-CT";
 
     @Autowired
-    public AnalyzerController(@Qualifier("AnalyzerSnowedCT") IAnalyzer snomedAnalyzer, @Qualifier("AnalyzerCustomOntology") IAnalyzer customOntologyAnalyzer) {
+    public AnalyzerController(@Qualifier("AnalyzerSnowedCT") IAnalyzer snomedAnalyzer, @Qualifier("AnalyzerCustomOntology") IAnalyzer customOntologyAnalyzer, IOntologyService ontologyService) {
         this.snomedAnalyzer = snomedAnalyzer;
         this.customOntologyAnalyzer = customOntologyAnalyzer;
+        this.ontologyService = ontologyService;
     }
 
     @PostMapping("/project")
     @JwtTokenRequired
-    public StructuredData analyzeProject(@RequestHeader("Authorization") String token, @RequestBody StructuredData structuredData, Ontology ontology) throws IOException {
+    public StructuredData analyzeProject(@RequestHeader("Authorization") String token, @RequestBody StructuredData structuredData, @RequestParam("ontologyId") String ontologyId) throws IOException {
 
         if (structuredData == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "StructuredData is null");
+
+        Ontology ontology = this.ontologyService.getOntologyById(ontologyId);
 
         if (ontology != null && ontology.getName() != null && !ontology.getName().equals(DEFAULT_ONTOLOGY))
             return customOntologyAnalyzer.analyze(structuredData, ontology);
@@ -46,7 +51,7 @@ public class AnalyzerController {
     @GetMapping("/labels")
     //@JwtTokenRequired
     public LabelSummary getLabels(@RequestHeader("Authorization") String token, @RequestParam(name = "value") String value,
-                                  @RequestParam(required = false, name = "offset") Integer offset, @RequestParam(required = false, name = "limit") Integer limit, Ontology ontology) {
+                                  @RequestParam(required = false, name = "offset") Integer offset, @RequestParam(required = false, name = "limit") Integer limit,@RequestParam("ontologyId") String ontologyId) {
 
         if (value == null || value.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "value is null or empty");
@@ -54,6 +59,8 @@ public class AnalyzerController {
         if (offset == null) offset = 1;
 
         if (limit == null) limit = 10;
+
+        Ontology ontology = this.ontologyService.getOntologyById(ontologyId);
 
         if (ontology != null && ontology.getName() != null && !ontology.getName().equals(DEFAULT_ONTOLOGY))
             return customOntologyAnalyzer.getLabels(value, offset, limit, ontology);

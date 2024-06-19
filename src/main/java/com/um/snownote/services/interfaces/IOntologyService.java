@@ -11,8 +11,9 @@ public interface IOntologyService {
 
     public Ontology loadOntology(MultipartFile file, String name, String iri);
     public Ontology save(Ontology ontology);
-    public OWLOntology getOntology(Ontology ontology) throws OWLOntologyCreationException;
-    public OWLOntology getOntologyById(String id);
+    public Ontology getOntologyById(String id);
+    public OWLOntology getOwlOntology(Ontology ontology) throws OWLOntologyCreationException;
+    public OWLOntology getOwlOntologyById(String id);
     public void deleteOntology(Ontology ontology);
 
 

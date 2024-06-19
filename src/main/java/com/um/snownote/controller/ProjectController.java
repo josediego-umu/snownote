@@ -4,10 +4,12 @@ import com.um.snownote.dto.ProjectDTO;
 import com.um.snownote.filters.*;
 import com.um.snownote.jwtUtils.JwtTokenRequired;
 import com.um.snownote.jwtUtils.JwtUtil;
+import com.um.snownote.model.Ontology;
 import com.um.snownote.model.Project;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.model.User;
 import com.um.snownote.services.interfaces.ILoaderFile;
+import com.um.snownote.services.interfaces.IOntologyService;
 import com.um.snownote.services.interfaces.IProjectServices;
 import com.um.snownote.services.interfaces.IUserService;
 import io.jsonwebtoken.JwtException;
@@ -31,16 +33,18 @@ import java.util.Map;
 @RequestMapping("/project")
 public class ProjectController {
     private final IProjectServices projectServices;
+    private final IOntologyService ontologyService;
     private final ILoaderFile loaderFileCsv;
     private final ILoaderFile loaderFileJson;
     private final IUserService userService;
 
     @Autowired
-    public ProjectController(IProjectServices projectServices, @Qualifier("LoaderFileCsv") ILoaderFile loaderFileCsv, @Qualifier("LoaderFileJson") ILoaderFile loaderFileJson, IUserService userService) {
+    public ProjectController(IProjectServices projectServices, @Qualifier("LoaderFileCsv") ILoaderFile loaderFileCsv, @Qualifier("LoaderFileJson") ILoaderFile loaderFileJson, IUserService userService, IOntologyService ontologyService) {
         this.projectServices = projectServices;
         this.loaderFileCsv = loaderFileCsv;
         this.loaderFileJson = loaderFileJson;
         this.userService = userService;
+        this.ontologyService = ontologyService;
     }
 
 
@@ -62,6 +66,20 @@ public class ProjectController {
 
 
         return projectServices.createProject(name, userOwner, description, visibility, structuredData);
+    }
+    @PostMapping("/ontology/")
+    public Project loadOntology(@RequestParam("id") String id, @RequestParam("name") String name, @RequestParam("iri") String iri, @RequestParam("file") MultipartFile file) {
+
+        Project project = this.projectServices.getProjectById(id);
+        if (project == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found");
+        Ontology ontology = this.ontologyService.loadOntology(file, name, iri);
+
+        project.getOntologies().put(ontology.getId(),ontology.getName());
+
+        this.projectServices.updateProject(project, project.getOwner());
+
+        return project;
     }
 
     @GetMapping("/{id}")

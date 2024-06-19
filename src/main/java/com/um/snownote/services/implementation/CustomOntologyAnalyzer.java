@@ -103,7 +103,7 @@ public class CustomOntologyAnalyzer implements IAnalyzer {
             return owlOntology;
 
 
-        owlOntology = ontologyService.getOntologyById(ontology.getId());
+        owlOntology = ontologyService.getOwlOntologyById(ontology.getId());
 
         ontologyCache.addObject(ontology.getId(), owlOntology);
 
