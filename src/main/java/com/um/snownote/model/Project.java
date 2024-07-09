@@ -5,6 +5,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Document(collection = "projects")
@@ -36,6 +38,14 @@ public class Project extends AuditData {
         this.description = description;
         this.historyEntries = new ArrayList<>();
         this.ontologies = new HashMap<>();
+        this.readers = new ArrayList<>();
+        this.writers = new ArrayList<>();
+        this.visibility = "private";
+        HistoryEntry historyEntry = new HistoryEntry();
+        historyEntry.setUser(owner.getUsername());
+        historyEntry.setAction("created Project");
+        historyEntry.setTimestamp(LocalDateTime.now());
+        this.historyEntries.add(historyEntry);
 
     }
 

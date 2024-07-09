@@ -6,13 +6,17 @@ import com.um.snownote.model.Ontology;
 import com.um.snownote.model.StructuredData;
 import com.um.snownote.services.interfaces.IAnalyzer;
 import com.um.snownote.services.interfaces.IOntologyService;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.search.EntitySearcher;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -43,7 +47,7 @@ public class CustomOntologyAnalyzer implements IAnalyzer {
         for (List<String> row : rows) {
             for (String value : row) {
                 if (value != null && !value.isEmpty()) {
-                    List<String> labels = getLabels(value, 0, 1, null).getLabels();
+                    List<String> labels = getLabels(value, 0, 1, ontology).getLabels();
                     if (!labels.isEmpty()) {
                         String label = labels.get(0);
                         structuredData.getLabels().put(value, label);
@@ -67,23 +71,33 @@ public class CustomOntologyAnalyzer implements IAnalyzer {
 
         OWLOntology owlOntology = getOWLOntology(ontology);
 
-        if (owlOntology == null)
-            return null;
+        OWLOntologyManager manager = owlOntology.getOWLOntologyManager();
 
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+        OWLAnnotationProperty labelProperty = dataFactory.getOWLAnnotationProperty(OWLRDFVocabulary.RDFS_LABEL.getIRI());
 
-        List<OWLEntity> filters = owlOntology.getClassesInSignature().stream()
-                .filter(owlClass -> {
-                    System.out.println(owlClass.getIRI().getFragment().toUpperCase());
-                    return owlClass.getIRI().getFragment().toUpperCase().contains(value.toUpperCase());
+        Set<OWLClass> classes = owlOntology.getClassesInSignature();
 
-                }).collect(Collectors.toList());
+        List<String> filters = new ArrayList<>();
+
+        for (OWLClass cls : classes) {
+            EntitySearcher.getAnnotations(cls, owlOntology, labelProperty).forEach(annotation -> {
+                if (annotation.getValue() instanceof OWLLiteral) {
+
+                    OWLLiteral val = (OWLLiteral) annotation.getValue();
+                    if (val.getLiteral().toUpperCase().contains(value.toUpperCase())) {
+                        String remainder = cls.getIRI().getRemainder().orElse("No remainder");
+                        filters.add(" \" " + remainder + " | " + val.getLiteral() + " | \" ");
+                    }
+                }
+            });
+        }
 
         totalLabels = filters.size();
 
         List<String> labels = filters.stream()
                 .skip((long) Math.max(0, (offset - 1)) * limit)
                 .limit(limit)
-                .map(owlClass -> owlClass.getIRI().getFragment())
                 .toList();
 
         labelSummary.setLabels(labels);
