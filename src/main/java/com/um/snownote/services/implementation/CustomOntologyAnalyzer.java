@@ -56,7 +56,7 @@ public class CustomOntologyAnalyzer implements IAnalyzer {
             }
         }
 
-        return null;
+        return structuredData;
     }
 
     @Override

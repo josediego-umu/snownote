@@ -29,18 +29,11 @@ public class SnowedCTAnalyzer implements IAnalyzer {
         List<List<String>> rows = structuredData.getRows();
         Map<String, String> labelMap = new HashMap<>();
 
-        structuredData.setColumnsToValues(columnsToValueInit(rows.get(0)));
-
         for (int i = 1; i < rows.size(); i++) {
 
             for (int j = 0; j < rows.get(i).size(); j++) {
 
                 String value = rows.get(i).get(j);
-
-                if (!value.isEmpty() && !isNumber(value)) {
-
-                    structuredData.getColumnsToValues().get(structuredData.getRows().get(0).get(j)).add(value);
-                }
 
                 if (!value.isEmpty() && labelMap.get(value) == null) {
 

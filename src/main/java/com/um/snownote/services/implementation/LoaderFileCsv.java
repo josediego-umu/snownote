@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service("LoaderFileCsv")
 public class LoaderFileCsv implements ILoaderFile {
@@ -48,12 +47,12 @@ public class LoaderFileCsv implements ILoaderFile {
 
             CSVWriter csvWriter = new CSVWriter(exportCSV);
             List<List<String>> rows = structuredData.getRows();
-            Map<String,String> label = structuredData.getLabels();
+            Map<String, String> label = structuredData.getLabels();
 
             for (List<String> row : rows) {
 
-               String[] csvRow = (String[]) row.stream()
-                        .map( value -> label.get(value) != null ? value +  label.get(value) : value)
+                String[] csvRow = (String[]) row.stream()
+                        .map(value -> label.get(value) != null ? value + label.get(value) : value)
                         .toArray();
 
                 csvWriter.writeNext(csvRow);
@@ -75,11 +74,30 @@ public class LoaderFileCsv implements ILoaderFile {
     private StructuredData load(CSVReader csvReader) throws IOException, CsvValidationException {
 
         StructuredData structuredData = new StructuredData();
+        Map<String, Set<String>> columnsToValues = new HashMap<>();
 
         String[] line;
         while ((line = csvReader.readNext()) != null) {
+
             structuredData.getRows().add(List.of(line));
+
         }
+
+        List<List<String>> rows = structuredData.getRows();
+
+        for (int i = 1; i < rows.size(); i++) {
+            List<String> row = rows.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                String value = row.get(j);
+                if (!columnsToValues.containsKey(rows.get(0).get(j))) {
+                    columnsToValues.put(rows.get(0).get(j), new HashSet<>());
+                }
+                columnsToValues.get(rows.get(0).get(j)).add(value);
+            }
+
+        }
+
+        structuredData.setColumnsToValues(columnsToValues);
 
         return structuredData;
     }
