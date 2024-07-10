@@ -40,10 +40,14 @@ public class VisibilityFilter implements Filter<ProjectDTO> {
 
     private Criteria getPrivateCriteria() {
 
-        if(user == null)
-            return new Criteria();
+        ObjectId userId;
 
-        ObjectId userId = new ObjectId(user.getId());
+        if (user == null) {
+            userId = new ObjectId("000000000000000000000000");
+
+        } else {
+            userId = new ObjectId(user.getId());
+        }
 
         return Criteria.where(field).is(privateV)
                 .orOperator(

@@ -29,7 +29,7 @@ public class SnowedCTAnalyzer implements IAnalyzer {
         List<List<String>> rows = structuredData.getRows();
         Map<String, String> labelMap = new HashMap<>();
 
-        for (int i = 1; i < rows.size(); i++) {
+        for (int i = 0; i < rows.size(); i++) {
 
             for (int j = 0; j < rows.get(i).size(); j++) {
 
